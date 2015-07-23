@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %} Chart tester {% endblock %}
+{% block brand_href %} href="/"{% endblock %}
+
+{% block content_1 %}
+<div class="container">
+    <div class="col-sm-6" style="height:130px;">
+        <div class="form-group">
+            <div class='input-group date' id='datetimepicker10'>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar">
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $('#datetimepicker10').datetimepicker({
+                viewMode: 'years',
+                format: 'MM/YYYY'
+            });
+        });
+    </script>
+</div>
+{#<img src={{ image }}>#}
+{% endblock %}
+{% block content_2 %}
+    {{chart|safe}}
+{% endblock %}
+{% block content_footer %}
+    <p class="navbar-text">Footer</p>
+{% endblock %}
