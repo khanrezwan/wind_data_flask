@@ -1,3 +1,4 @@
+Nrg rwd files imported as text and viewed in this flask + angular js web app
 I will assume you are using virtualenv to install $ sudo apt-get install virtualenv
 [1] $ cd path/to/wind_data_flask (I will assume u r in this directory)
 [2] $ virtualenv venv
