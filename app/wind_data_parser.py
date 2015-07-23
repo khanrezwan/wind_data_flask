@@ -4,8 +4,8 @@ import time
 from app import db
 from .models import File, RawData, Sensor, Logger, Site
 
-# ToDO: [1] Add Try catch blocks
-# ToDO:[2] Add various plotting functions for Sensor class e.g. by month/ day/ time point/ week etc.
+# ToDO [1] Add Try catch blocks
+#
 # ToDO: [5] Using SqlAlchemy version 0.8.4 read this tut http://www.blog.pythonlibrary.org/2012/07/01/a-simple-sqlalchemy-0-7-0-8-tutorial/
 # ToDO: http://docs.sqlalchemy.org/en/rel_0_8/orm/relationships.html#relationship-patterns
 # ToDO: [6] Regular expression to extract data from filename. import re then re.match('regex','input_string')

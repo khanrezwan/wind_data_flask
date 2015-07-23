@@ -19,6 +19,119 @@ from ..models import *
 
 Json_date_obj_pattern = '%Y-%m-%dT%H:%M:%S.%fZ'
 
+class Rawdata_plotter(object):
+    """
+    Helper functions for querries on rawdata
+    returns query object
+    """
+    @staticmethod
+    def get_Data_Date_24Hr(date, sensor_id):
+        if isinstance(date, datetime.datetime):
+            try:
+                sensor_id = int(sensor_id)
+            except ValueError:
+                raise ValueError('sensor_id must be an integer')
+            query = RawData.query.filter(
+                RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
+                RawData.fk_sensor_id == sensor_id)
+            # print query.count()
+            return query
+        else:
+            raise TypeError('date must be of type datetime.datetime')
+        pass
+
+    @staticmethod
+    def get_Data_Date_Single_Point(date, sensor_id):
+        if isinstance(date, datetime.datetime):
+            try:
+                sensor_id = int(sensor_id)
+            except ValueError:
+                raise ValueError('sensor_id must be an integer')
+            query = RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
+                                                db.func.avg(RawData.ch_max).label('ch_max'),
+                                                db.func.avg(RawData.ch_avg).label('ch_avg')).\
+                filter(RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
+                       RawData.fk_sensor_id == sensor_id)
+            print query.count()
+            return query
+        else:
+            raise TypeError('date must be of type datetime.datetime')
+        pass
+
+    @staticmethod
+    def get_Data_Date_Range_24Hr(startDate, endDate, sensor_id):
+        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
+            try:
+                sensor_id = int(sensor_id)
+            except ValueError:
+                raise ValueError('sensor_id must be an integer')
+            start_date_param = str(startDate.year) + str(startDate.month) + str(startDate.day)
+            end_date_param = str(endDate.year) + str(endDate.month) + str(endDate.day)
+            query = RawData.query.filter(
+                RawData.yearmonthdate_stamp >= start_date_param,
+                RawData.yearmonthdate_stamp <= end_date_param,
+                RawData.fk_sensor_id == sensor_id)
+
+            # ToDo-Rezwan get average for a all dates date where time stamp == some particular time stamp
+            # ToDo-Rezwan get a set of available time and run avg query
+            # test code start
+            testquery = query.all()
+            date_list = list()
+            for item in testquery:
+                date_list.append(int(item.yearmonthdate_stamp))
+            s = sorted(set(date_list))  # set is unique item
+
+            for item in s:
+                print item
+            print 'total dates = ', s.__len__()
+            #test code end
+            return query
+        else:
+            raise TypeError('date must be of type datetime.datetime')
+        pass
+
+    @staticmethod
+    def get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id):
+        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
+            try:
+                sensor_id = int(sensor_id)
+            except ValueError:
+                raise ValueError('sensor_id must be an integer')
+            start_date_param = str(startDate.year) + str(startDate.month) + str(startDate.day)
+            end_date_param = str(endDate.year) + str(endDate.month) + str(endDate.day)
+            query = RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
+                                                db.func.avg(RawData.ch_max).label('ch_max'),
+                                                db.func.avg(RawData.ch_avg).label('ch_avg')).\
+                filter(
+                RawData.yearmonthdate_stamp >= start_date_param,
+                RawData.yearmonthdate_stamp <= end_date_param,
+                RawData.fk_sensor_id == sensor_id)
+           #test code start
+            print 'count ', query.count()
+            print 'ch_max ', query.first().ch_max
+            print 'ch_min ', query.first().ch_min
+            print 'ch_avg ', query.first().ch_avg
+            #test code end
+            return query
+        else:
+            raise TypeError('date must be of type datetime.datetime')
+        pass
+
+    pass
+
+@raw_data_plotter.route('/test')
+# Testing Rawdata_plotter helper class
+def class_tester():
+    Rawdata_plotter.get_Data_Date_Range_Single_Point(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 7, 31), 1)
+    return make_response(jsonify({'success': 'true'}), 200)
+# def ajs_test_1():
+#
+#     Rawdata_plotter.get_Data_Date_Range_24Hr(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 5, 31), 1)
+#     return render_template('raw_data_plotter/query_tester.html')
+#
+#     pass
+
+
 def jsonify_date(obj):
     """
     JSON serializer for datetime objects not serializable by default json code
@@ -149,6 +262,7 @@ def get_Plot_Data_Date_Single_Point():
 
 @raw_data_plotter.route('/getPlotDataDateRange24Hr', methods=['Get'])
 def get_Plot_Data_Date_Range_24Hr():
+
     return jsonify({
 
         'success': True,
@@ -200,11 +314,7 @@ def query_test():
     pass
 
 
-@raw_data_plotter.route('/test')
-def ajs_test_1():
 
-    return render_template('raw_data_plotter/query_tester.html')
-    pass
 
 
 @raw_data_plotter.route('/test_ret/<name>', methods=['Get'])
