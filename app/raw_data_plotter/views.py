@@ -67,25 +67,37 @@ class Rawdata_plotter(object):
                 raise ValueError('sensor_id must be an integer')
             start_date_param = str(startDate.year) + str(startDate.month) + str(startDate.day)
             end_date_param = str(endDate.year) + str(endDate.month) + str(endDate.day)
-            query = RawData.query.filter(
+
+            query_distinct_time_stamps = RawData.query.with_entities(RawData.time_stamp.distinct().label('time_stamp')).filter(
                 RawData.yearmonthdate_stamp >= start_date_param,
                 RawData.yearmonthdate_stamp <= end_date_param,
                 RawData.fk_sensor_id == sensor_id)
+            query_list = list()
+            for item in query_distinct_time_stamps.all():
 
+                query_list.append(RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
+                                                              db.func.avg(RawData.ch_max).label('ch_max'),
+                                                              db.func.avg(RawData.ch_avg).label('ch_avg'),
+                                                              RawData.time_stamp.label('time_stamp')).filter(
+
+                    RawData.yearmonthdate_stamp >= start_date_param,
+                    RawData.yearmonthdate_stamp <= end_date_param,
+                    RawData.fk_sensor_id == sensor_id,
+                    RawData.time_stamp == item.time_stamp))
             # ToDo-Rezwan get average for a all dates date where time stamp == some particular time stamp
             # ToDo-Rezwan get a set of available time and run avg query
             # test code start
-            testquery = query.all()
-            date_list = list()
-            for item in testquery:
-                date_list.append(int(item.yearmonthdate_stamp))
-            s = sorted(set(date_list))  # set is unique item
+            for item in query.all():
+                print item.time_stamp
+            for res in query_list:
+                print 'count ', res.count()
+                print 'time', res.first().time_stamp
+                print 'ch_max ', res.first().ch_max
+                print 'ch_min ', res.first().ch_min
+                print 'ch_avg ', res.first().ch_avg
 
-            for item in s:
-                print item
-            print 'total dates = ', s.__len__()
-            #test code end
-            return query
+            # test code end
+            return query_list
         else:
             raise TypeError('date must be of type datetime.datetime')
         pass
@@ -122,7 +134,7 @@ class Rawdata_plotter(object):
 @raw_data_plotter.route('/test')
 # Testing Rawdata_plotter helper class
 def class_tester():
-    Rawdata_plotter.get_Data_Date_Range_Single_Point(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 7, 31), 1)
+    Rawdata_plotter.get_Data_Date_Range_24Hr(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 7, 31), 1)
     return make_response(jsonify({'success': 'true'}), 200)
 # def ajs_test_1():
 #
