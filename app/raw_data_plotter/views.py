@@ -13,183 +13,22 @@ import pygal
 
 from . import raw_data_plotter
 from .forms import *
-
+from .Rawdata_plotter_helper import Rawdata_plotter_helper
 from .. import db
 from ..models import *
 
-# ToDo-Rezwan make all routes return x,y data in following json format {"xy_list":[{"xy":{"x":1,"y":1}},{"xy":{"x":2,"y":6}},{"xy":{"x":4,"y":9}}]}
-# ToDo-Rezwan Re-think the possible querries...date range single data point for each date
-# ToDo decide where the json conversion for plot data will go
+
+
+
 Json_date_obj_pattern = '%Y-%m-%dT%H:%M:%S.%fZ'
-
-class Rawdata_plotter(object):
-    """
-    Helper functions for querries on rawdata
-    returns query object
-    """
-    @staticmethod
-    def get_Data_Date_24Hr(date, sensor_id):
-        if isinstance(date, datetime.datetime):
-            try:
-                sensor_id = int(sensor_id)
-            except ValueError:
-                raise ValueError('sensor_id must be an integer')
-            query = RawData.query.filter(
-                RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
-                RawData.fk_sensor_id == sensor_id)
-            # print query.count()
-            return query
-        else:
-            raise TypeError('date must be of type datetime.datetime')
-        pass
-
-    @staticmethod
-    def get_Data_Date_Single_Point(date, sensor_id):
-        if isinstance(date, datetime.datetime):
-            try:
-                sensor_id = int(sensor_id)
-            except ValueError:
-                raise ValueError('sensor_id must be an integer')
-            query = RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
-                                                db.func.avg(RawData.ch_max).label('ch_max'),
-                                                db.func.avg(RawData.ch_avg).label('ch_avg')).\
-                filter(RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
-                       RawData.fk_sensor_id == sensor_id)
-            print query.count()
-            return query
-        else:
-            raise TypeError('date must be of type datetime.datetime')
-        pass
-
-    @staticmethod
-    def get_Data_Date_Range_24Hr(startDate, endDate, sensor_id):
-        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
-            try:
-                sensor_id = int(sensor_id)
-            except ValueError:
-                raise ValueError('sensor_id must be an integer')
-            start_date_param = str(startDate.year) + str(startDate.month) + str(startDate.day)
-            end_date_param = str(endDate.year) + str(endDate.month) + str(endDate.day)
-
-            query_distinct_time_stamps = RawData.query.with_entities(RawData.time_stamp.distinct().label('time_stamp')).filter(
-                RawData.yearmonthdate_stamp >= start_date_param,
-                RawData.yearmonthdate_stamp <= end_date_param,
-                RawData.fk_sensor_id == sensor_id)
-            query_list = list()
-            for item in query_distinct_time_stamps.all():
-
-                query_list.append(RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
-                                                              db.func.avg(RawData.ch_max).label('ch_max'),
-                                                              db.func.avg(RawData.ch_avg).label('ch_avg'),
-                                                              RawData.time_stamp.label('time_stamp')).filter(
-
-                    RawData.yearmonthdate_stamp >= start_date_param,
-                    RawData.yearmonthdate_stamp <= end_date_param,
-                    RawData.fk_sensor_id == sensor_id,
-                    RawData.time_stamp == item.time_stamp))
-            # ToDo-Rezwan get average for a all dates date where time stamp == some particular time stamp
-            # ToDo-Rezwan get a set of available time and run avg query
-            # test code start
-            for item in query_distinct_time_stamps.all():
-                print item.time_stamp
-            for res in query_list:
-                print 'count ', res.count()
-                print 'time', res.first().time_stamp
-                print 'ch_max ', res.first().ch_max
-                print 'ch_min ', res.first().ch_min
-                print 'ch_avg ', res.first().ch_avg
-
-            # test code end
-            return query_list
-        else:
-            raise TypeError('date must be of type datetime.datetime')
-        pass
-
-    @staticmethod
-    def get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id):
-        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
-            try:
-                sensor_id = int(sensor_id)
-            except ValueError:
-                raise ValueError('sensor_id must be an integer')
-            start_date_param = str(startDate.year) + str(startDate.month) + str(startDate.day)
-            end_date_param = str(endDate.year) + str(endDate.month) + str(endDate.day)
-            query = RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
-                                                db.func.avg(RawData.ch_max).label('ch_max'),
-                                                db.func.avg(RawData.ch_avg).label('ch_avg')).\
-                filter(
-                RawData.yearmonthdate_stamp >= start_date_param,
-                RawData.yearmonthdate_stamp <= end_date_param,
-                RawData.fk_sensor_id == sensor_id)
-           #test code start
-            print 'count ', query.count()
-            print 'ch_max ', query.first().ch_max
-            print 'ch_min ', query.first().ch_min
-            print 'ch_avg ', query.first().ch_avg
-            #test code end
-            return query
-        else:
-            raise TypeError('date must be of type datetime.datetime')
-        pass
-
-    # ToDo-Rezwan add data_date_range_single data point for each date
-    @staticmethod
-    def get_Data_Month_Single_Point(date, sensor_id):
-        if isinstance(date, datetime.datetime):
-            try:
-                sensor_id = int(sensor_id)
-            except ValueError:
-                raise ValueError('sensor_id must be an integer')
-
-            (weekday_of_first_day_month, end_date_month) = calendar.monthrange(date.year, date.month)
-
-            start_date = datetime.datetime(date.year, date.month, 1)
-            print type(start_date)
-            end_date = datetime.datetime(date.year, date.month, end_date_month)
-            query = Rawdata_plotter.get_Data_Date_Range_Single_Point(start_date, end_date, sensor_id)
-
-           #test code start
-            print 'count ', query.count()
-            print 'ch_max ', query.first().ch_max
-            print 'ch_min ', query.first().ch_min
-            print 'ch_avg ', query.first().ch_avg
-            #test code end
-            return query
-        else:
-            raise TypeError('date must be of type datetime.datetime')
-        pass
-    # ToDo Add function multiple month to single point. the following one is multiple months with one data point for each month
-    @staticmethod
-    def get_Data_Month_Range_Single_Point(startDate, endDate, sensor_id):  # single data point for each month
-        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
-            try:
-                sensor_id = int(sensor_id)
-            except ValueError:
-                raise ValueError('sensor_id must be an integer')
-            startDate_query = datetime.datetime(startDate.year,startDate.month,1)
-            # (weekday_of_first_day_month, end_Date_ofmonth) = calendar.monthrange(endDate.year, endDate.month)
-            endDate_query = datetime.datetime(endDate.year, endDate.month, 1)
-            # enddate_query = datetime.datetime(enddate.year,enddate.month)
-            query_list = list()
-            month_list = list()
-            for dt in rrule.rrule(rrule.MONTHLY,dtstart=startDate_query,until=endDate_query):
-                query_list.append(Rawdata_plotter.get_Data_Month_Single_Point(dt,1))
-                month_list.append(dt)
-                print dt
-
-            return query_list, month_list  # Todo dictionary or tuple?
-        else:
-            raise TypeError('date must be of type datetime.datetime')
-
-        pass
-
-    pass
+# ToDo-Rezwan Collapse all route into one or two..i.e. route factory
 
 @raw_data_plotter.route('/test')
 # Testing Rawdata_plotter helper class
 def class_tester():
     # Rawdata_plotter.get_Data_Month_Single_Point(datetime.datetime(2015, 6, 22), 1)
-    Rawdata_plotter.get_Data_Month_Range_Single_Point(datetime.datetime(2015, 5, 22), datetime.datetime(2016, 6, 22), 1)
+
+    Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 6, 30), 1)
     return make_response(jsonify({'success': 'true'}), 200)
 # def ajs_test_1():
 #
