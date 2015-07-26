@@ -16,7 +16,7 @@ from .forms import *
 from .Rawdata_plotter_helper import Rawdata_plotter_helper
 from .. import db
 from ..models import *
-
+from .json_builder import JsonBuilder
 
 
 
@@ -28,7 +28,10 @@ Json_date_obj_pattern = '%Y-%m-%dT%H:%M:%S.%fZ'
 def class_tester():
     # Rawdata_plotter.get_Data_Month_Single_Point(datetime.datetime(2015, 6, 22), 1)
 
-    Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 6, 30), 1)
+    query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1),1)
+    query,date = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 5, 20), 20)
+    query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1),20)
+    JsonBuilder.json_response(query,datetime.datetime(2015, 5, 1),99,Xlabel=JsonBuilder.TIMESTAMP)
     return make_response(jsonify({'success': 'true'}), 200)
 # def ajs_test_1():
 #

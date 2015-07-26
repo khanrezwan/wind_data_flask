@@ -12,6 +12,16 @@ class Rawdata_plotter_helper(object):
     returns query object
     """
     @staticmethod
+    def dictionary_builder(query, startdate=None, enddate=None, sensor_id=None):
+        return {
+            "query": query,
+            "startDate": startdate,
+            "endDate": enddate,
+            "sensor_id": sensor_id
+        }
+
+        pass
+    @staticmethod
     def get_Data_Date_24Hr(date, sensor_id):
         if isinstance(date, datetime.datetime):
             try:
@@ -23,6 +33,7 @@ class Rawdata_plotter_helper(object):
                 RawData.fk_sensor_id == sensor_id)
             # print query.count()
             return query
+            # return Rawdata_plotter_helper.dictionary_builder(query, startdate=date, sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
         pass
@@ -216,4 +227,7 @@ class Rawdata_plotter_helper(object):
 
         pass
 
+    # Todo-Rezwan Add Monthly 24 Hr view and Monthly 24 Hr view for a range
+
     pass
+
