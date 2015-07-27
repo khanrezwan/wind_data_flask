@@ -26,13 +26,13 @@ Json_date_obj_pattern = '%Y-%m-%dT%H:%M:%S.%fZ'
 @raw_data_plotter.route('/test')
 # Testing Rawdata_plotter helper class
 def class_tester():
-    # Rawdata_plotter.get_Data_Month_Single_Point(datetime.datetime(2015, 6, 22), 1)
+    query = Rawdata_plotter_helper.get_Data_Date_Single_Point(datetime.datetime(2015, 6, 22), 1)
 
-    query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1),1)
-    query,date = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 5, 20), 20)
-    query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1),20)
-    JsonBuilder.json_response(query,datetime.datetime(2015, 5, 1),99,Xlabel=JsonBuilder.TIMESTAMP)
-    return make_response(jsonify({'success': 'true'}), 200)
+    # query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1),1)
+    # query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 5, 20), 1)
+    # query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1), 20)
+    JsonBuilder.json_response(query, Xlabel=JsonBuilder.TIMESTAMP)
+    return make_response(jsonify({'Plot': JsonBuilder.json_response(query, Xlabel=JsonBuilder.TIMESTAMP), 'success': 'true'}), 200)
 # def ajs_test_1():
 #
 #     Rawdata_plotter.get_Data_Date_Range_24Hr(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 5, 31), 1)

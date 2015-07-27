@@ -6,21 +6,25 @@ from dateutil import rrule
 from .. import db
 from ..models import RawData
 
+dict_keys = ["query", "date", "sensor_id", "time_stamp"]  # Update this list if key in dictionary_builder changes
+
 class Rawdata_plotter_helper(object):
     """
     Helper functions for querries on rawdata
     returns query object
     """
+
     @staticmethod
-    def dictionary_builder(query, startdate=None, enddate=None, sensor_id=None):
+    def dictionary_builder(query, date=None, sensor_id=None, time_stamp=None):
         return {
             "query": query,
-            "startDate": startdate,
-            "endDate": enddate,
-            "sensor_id": sensor_id
+            "date": date,
+            "sensor_id": sensor_id,
+            "time_stamp": time_stamp
         }
 
-        pass
+
+
     @staticmethod
     def get_Data_Date_24Hr(date, sensor_id):
         if isinstance(date, datetime.datetime):
@@ -31,9 +35,17 @@ class Rawdata_plotter_helper(object):
             query = RawData.query.filter(
                 RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
                 RawData.fk_sensor_id == sensor_id)
+            query_distinct_time_stamps = RawData.query.with_entities(RawData.time_stamp.distinct().label('time_stamp')).filter(
+                RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
+                RawData.fk_sensor_id == sensor_id)
+            time_stamp_list = list()
+
+            for item in query_distinct_time_stamps.all():
+                time_stamp_list.append(item.time_stamp)
             # print query.count()
-            return query
-            # return Rawdata_plotter_helper.dictionary_builder(query, startdate=date, sensor_id=sensor_id)
+            # return query
+            return Rawdata_plotter_helper.dictionary_builder(query, date=date, sensor_id=sensor_id,
+                                                             time_stamp=time_stamp_list)
         else:
             raise TypeError('date must be of type datetime.datetime')
         pass
@@ -51,7 +63,8 @@ class Rawdata_plotter_helper(object):
                 filter(RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
                        RawData.fk_sensor_id == sensor_id)
             print query.count()
-            return query
+            # return query
+            return Rawdata_plotter_helper.dictionary_builder(query, date=date, sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
         pass
@@ -71,6 +84,7 @@ class Rawdata_plotter_helper(object):
                 RawData.yearmonthdate_stamp <= end_date_param,
                 RawData.fk_sensor_id == sensor_id)
             query_list = list()
+            time_stamp_list = list()
             for item in query_distinct_time_stamps.all():
 
                 query_list.append(RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
@@ -82,6 +96,7 @@ class Rawdata_plotter_helper(object):
                     RawData.yearmonthdate_stamp <= end_date_param,
                     RawData.fk_sensor_id == sensor_id,
                     RawData.time_stamp == item.time_stamp))
+                time_stamp_list.append(item.time_stamp)
             # ToDo-Rezwan get average for a all dates date where time stamp == some particular time stamp
             # ToDo-Rezwan get a set of available time and run avg query
             # test code start
@@ -95,7 +110,9 @@ class Rawdata_plotter_helper(object):
                 print 'ch_avg ', res.first().ch_avg
 
             # test code end
-            return query_list
+            # return query_list
+            return Rawdata_plotter_helper.dictionary_builder(query_list, date=(startDate, endDate),
+                                                             sensor_id=sensor_id, time_stamp=time_stamp_list)
         else:
             raise TypeError('date must be of type datetime.datetime')
         pass
@@ -122,7 +139,8 @@ class Rawdata_plotter_helper(object):
             print 'ch_min ', query.first().ch_min
             print 'ch_avg ', query.first().ch_avg
             #test code end
-            return query
+            # return query
+            return Rawdata_plotter_helper.dictionary_builder(query, date=(startDate, endDate), sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
         pass
@@ -137,7 +155,8 @@ class Rawdata_plotter_helper(object):
             query_list = list()
             date_list = list()
             for dt in rrule.rrule(rrule.DAILY, dtstart=startDate,until=endDate):
-                query = Rawdata_plotter_helper.get_Data_Date_Single_Point(dt,sensor_id)
+                res = Rawdata_plotter_helper.get_Data_Date_Single_Point(dt,sensor_id)
+                query = res['query']
                 query_list.append(query)
                 date_list.append(dt)
            #test code start
@@ -146,7 +165,8 @@ class Rawdata_plotter_helper(object):
                 print 'ch_min ', query.first().ch_min
                 print 'ch_avg ', query.first().ch_avg
             #test code end
-            return query_list, date_list #ToDo dictionary or Tuple
+            # return query_list, date_list #ToDo dictionary or Tuple
+            return Rawdata_plotter_helper.dictionary_builder(query_list, date=date_list, sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
         pass
@@ -164,15 +184,15 @@ class Rawdata_plotter_helper(object):
             start_date = datetime.datetime(date.year, date.month, 1)
             print type(start_date)
             end_date = datetime.datetime(date.year, date.month, end_date_month)
-            query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(start_date, end_date, sensor_id)
-
+            res = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(start_date, end_date, sensor_id)
+            query = res['query']
            #test code start
             print 'count ', query.count()
             print 'ch_max ', query.first().ch_max
             print 'ch_min ', query.first().ch_min
             print 'ch_avg ', query.first().ch_avg
             #test code end
-            return query
+            return Rawdata_plotter_helper.dictionary_builder(query, date=date, sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
         pass
@@ -187,15 +207,16 @@ class Rawdata_plotter_helper(object):
             (weekday_of_first_day_month, end_date_of_month) = calendar.monthrange(endDate.year, endDate.month)
             startDate = datetime.datetime(startDate.year, startDate.month, 1)
             endDate = datetime.datetime(endDate.year, endDate.month, end_date_of_month)
-            query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id)
-
+            res = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id)
+            query = res['query']
             #test code start
             print 'count ', query.count()
             print 'ch_max ', query.first().ch_max
             print 'ch_min ', query.first().ch_min
             print 'ch_avg ', query.first().ch_avg
             #test code end
-            return query
+            # return query
+            return Rawdata_plotter_helper.dictionary_builder(query, date=(startDate, endDate), sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
 
@@ -217,11 +238,14 @@ class Rawdata_plotter_helper(object):
             query_list = list()
             month_list = list()
             for dt in rrule.rrule(rrule.MONTHLY,dtstart=startDate_query,until=endDate_query):
-                query_list.append(Rawdata_plotter_helper.get_Data_Month_Single_Point(dt,1))
+                res = Rawdata_plotter_helper.get_Data_Month_Single_Point(dt, sensor_id)
+                query = res["query"]
+                query_list.append(query)
                 month_list.append(dt)
 
 
-            return query_list, month_list  # Todo dictionary or tuple?
+            # return query_list, month_list  # Todo dictionary or tuple?
+            return Rawdata_plotter_helper.dictionary_builder(query_list, date=month_list, sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
 

@@ -5,6 +5,7 @@ import datetime
 #app specific imports
 from .. import db
 from ..models import RawData, Sensor
+from .Rawdata_plotter_helper import dict_keys
 # ToDo-Rezwan make all routes return x,y data in following json format {"xy_list":[{"xy":{"x":1,"y":1}},{"xy":{"x":2,"y":6}},{"xy":{"x":4,"y":9}}]}
 # ToDo-Rezwan use list comprehension to build json [{'X': itemX , 'Y' : itemY} for itemX, itemY in zip(xList,yList)]
 
@@ -42,97 +43,122 @@ class JsonBuilder(object):
     TIMESTAMP = 2
 
     @staticmethod
-    def json_response(query, date, sensor_id, query_is_List=False, date_is_List=False, Xlabel=MONTH):
+    def json_response(dictionary, Xlabel=MONTH):
+        # ToDo-Rezwan merge 1st + 4th if  and  3rd + 5th if
+        # ToDo-Rezwan make complete Json response rather than dicts
+        if isinstance(dictionary, dict):
+            dictionary_keys = dictionary.keys()
+            for key in dict_keys:
+                if key not in dictionary_keys:
+                    raise KeyError('Not the expected dictionary')
+        else:
+            raise ValueError("the parameter dictionary must be a python dict")
+        query = dictionary['query']
+        sensor_id = dictionary['sensor_id']
+        date = dictionary['date']
+        time_stamp = dictionary['time_stamp']
+
         print "Plot type ", Xlabel
-        sensor, found =JsonBuilder.sensor_validator(sensor_id)
+        sensor, found = JsonBuilder.sensor_validator(sensor_id)
         print sensor, ' ', found
         JsonBuilder.datetime_validator(date)
-        if isinstance(query,list):
-            if isinstance(date,list):
-                print "Query list Date List"
+        if found:
+            if isinstance(query, list) and isinstance(date, list) and time_stamp is None:
+                # get_Data_Date_Range_Single_Point_for_each_Date(startDate, endDate, sensor_id)
+                # get_Data_Month_Range_Single_Point_for_each_Month
+                query_list = list()
+                for q in query:
+                    query_list.append(q.first())
+                print 'in first if'
+                return ([{'X': JsonBuilder.serialize_date(itemX) , 'Y' : JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(date, query_list)])
+                pass
+            elif query.count() > 1 and not(isinstance(date, list) or isinstance(date, tuple)) and isinstance(time_stamp,list):
+                # get_Data_Date_24Hr(date, sensor_id)
+                # get_Data_Month_24Hr(date, sensor_id) to b implemented
+                print 'in 2nd if'
+                return ([{'X': itemX , 'Y' : JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(time_stamp, query.all())])
+
+                pass
+            elif query.count() == 1 and not(isinstance(date, list) or isinstance(date, tuple)) and time_stamp is None:
+                # get_Data_Date_Single_Point(date, sensor_id)
+                # get_Data_Month_Single_Point
+                print 'in 3rd if'
+                return {
+                    'X': JsonBuilder.serialize_date(date),
+                    'Y': JsonBuilder.serialize_data(query.first())
+                }
+                pass
+            elif isinstance(query, list) and isinstance(date, tuple) and isinstance(time_stamp, list):
+                # get_Data_Date_Range_24Hr(startDate, endDate, sensor_id)
+                # get_Data_Month_Range_24Hr(startDate, endDate, sensor_id) to b implemented
+                print 'in 4th if'
+                query_list = list()
+                for q in query:
+                    query_list.append(q.first())
+                return ([{'X': itemX , 'Y' : JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(time_stamp, query_list)])
+                pass
+            elif query.count() == 1 and isinstance(date, tuple) and time_stamp is None:
+                #get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id)
+                # get_Data_Month_Range_Single_Point
+                print 'in 5th if'
+                return {
+                    'X': JsonBuilder.serialize_date(date),
+                    'Y': JsonBuilder.serialize_data(query.first())
+                }
                 pass
             else:
-                # should be a list
-                print "Query list Date single point " # get_Data_Date_Range_24Hr
+                print 'WTF??'
+                return 'Query got 0 result', 404
                 pass
-
-            pass
-        elif query.count() == 1:
-            # Work with single point single for X and Y
-            if not isinstance(date, list):
-                print "Query single point Date single point"
-            else:
-                 print "Query single point Date list"
-
-            pass
-        elif query.count() > 1:
-            if not isinstance(date, list):
-                print "Query multi point Date single point"
-
-
-            else:
-                print "Query multi point Date list"
-
-            pass
         else:
-            print "No result in Query"
-            pass
-
-    # @staticmethod
-    # def json_response_single_data(query,date, sensor_id):
-    #     JsonBuilder.datetime_validator(date)
-    #     (sensor, found) = JsonBuilder.sensor_validator(sensor_id)
-    #     if found:  # sensor is model object of type Sensor
-    #         dataList = list()
-    #         dateList = list()
-    #         idx = 0
-    #         if isinstance(date, list()): # got a list so the json will be list
-    #             if query.count != 0:
-    #
-    #                 for data in query.all():
-    #                     if (data.ch_max is not None) or (data.ch_min is not None) or (data.ch_avg is not None):
-    #                         dataList.append(data)
-    #                         dateList.append(date[idx])
-    #                         idx += 1
-    #
-    #
-    #             else:
-    #                 return "No Result", 404
-    #                 pass
-    #         else: # got single date so the Json for single data point
-    #             if query.count() != 0:
-    #                 data = query.first()
-    #                 if (data.ch_max is not None) or (data.ch_min is not None) or (data.ch_avg is not None):
-    #                     dataList.append(data)
-    #                     dataList.append(date)
-    #         jsonify(
-    #             {
-    #                 'success': True,
-    #                 'YList': [{'Y': JsonBuilder.serialize_data(dataObj)} for dataObj in dataList],
-    #                 'XList': [{'X': JsonBuilder.serialize_date(dateObj)} for dateObj in dateList],
-    #                 'sensor': sensor.serialize()
-    #
-    #             })
-    #         pass
-    #     else:
-    #         return sensor, 404  # sensor is string and 404 return not found
-    #
-    #     pass
-    #
-    # @staticmethod
-    # def json_response_list(query_list, date_list, sensor_id):
-    #     pass
-    #
-    # @staticmethod
-    # def json_timestamp_response_list(query_list, date_list, sensor_id):
-    #     pass
+            return sensor, 404 #sensor is string and 404 is not found
+        # if isinstance(query, list):
+        #     print "Query list"
+        #     if isinstance(date, list):
+        #         print "Date is List"
+        #         pass
+        #     elif isinstance(date, tuple):
+        #         print "Date is tuple"
+        #         pass
+        #     else:
+        #         # should be a list
+        #         print "Date single point " # get_Data_Date_Range_24Hr
+        #         pass
+        #
+        #     pass
+        # elif query.count() == 1:
+        #     # Work with single point single for X and Y
+        #     print "Query single point"
+        #     if isinstance(date, list):
+        #         print "Date is list"
+        #     elif isinstance(date, tuple):
+        #         print "Date is tuple"
+        #     else:
+        #          print " Date single point"
+        #
+        #     pass
+        # elif query.count() > 1:
+        #     if isinstance(date, list):
+        #         print "Query multi point Date is list"
+        #
+        #     elif isinstance(date, tuple):
+        #         print "Date is tuple"
+        #
+        #     else:
+        #         print "Query multi point Date single point"
+        #
+        #     pass
+        # else:
+        #     print "No result in Query"
+        #     pass
 
     @staticmethod
     def datetime_validator(date):
-        if isinstance(date, list):
+        if isinstance(date, list) or isinstance(date, tuple):
             for dt in date:
                 if not isinstance(dt, datetime.datetime):
                     raise TypeError('date must be of type datetime.datetime')
+
         else:
             if not isinstance(date,datetime.datetime):
                 raise TypeError('date must be of type datetime.datetime')
@@ -165,11 +191,19 @@ class JsonBuilder(object):
         :param data_obj:
         :return:
         """
-        return {
-            "ch_max": "{0:.2f}".format(data_obj.ch_max),
-            "ch_min": "{0:.2f}".format(data_obj.ch_min),
-            "ch_Avg": "{0:.2f}".format(data_obj.ch_avg)
-        }
+        # if not isinstance(data_obj.ch_avg, basestring) and not isinstance(data_obj.ch_max, basestring) and not isinstance(data_obj.ch_min, basestring):
+        if data_obj.ch_avg and data_obj.ch_max and data_obj.ch_min:
+            return {
+                "ch_max": float("{0:.2f}".format(data_obj.ch_max)),
+                "ch_min": float("{0:.2f}".format(data_obj.ch_min)),
+                "ch_Avg": float("{0:.2f}".format(data_obj.ch_avg))
+            }
+        else:
+            return {
+                "ch_max": (data_obj.ch_max),
+                "ch_min": (data_obj.ch_min),
+                "ch_Avg": (data_obj.ch_avg)
+            }
 
     @staticmethod
     def serialize_date(obj):
