@@ -98,8 +98,7 @@ class Rawdata_plotter_helper(object):
                         RawData.fk_sensor_id == sensor_id,
                         RawData.time_stamp == item.time_stamp))
                     time_stamp_list.append(item.time_stamp)
-                # ToDo-Rezwan get average for a all dates date where time stamp == some particular time stamp
-                # ToDo-Rezwan get a set of available time and run avg query
+
                 # test code start
                 for item in query_distinct_time_stamps.all():
                     print item.time_stamp
@@ -172,7 +171,7 @@ class Rawdata_plotter_helper(object):
                     print 'ch_min ', query.first().ch_min
                     print 'ch_avg ', query.first().ch_avg
                 #test code end
-                # return query_list, date_list #ToDo dictionary or Tuple
+                # return query_list, date_list
                 return Rawdata_plotter_helper.dictionary_builder(query_list, date=date_list, sensor_id=sensor_id)
             else:
                 raise ValueError('End date must be greater than or equal to start date')
@@ -257,7 +256,7 @@ class Rawdata_plotter_helper(object):
                     month_list.append(dt)
 
 
-                # return query_list, month_list  # Todo dictionary or tuple?
+                # return query_list, month_list
                 return Rawdata_plotter_helper.dictionary_builder(query_list, date=month_list, sensor_id=sensor_id)
             else:
                 raise ValueError('End date must be greater than or equal to start date')

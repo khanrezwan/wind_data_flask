@@ -48,7 +48,7 @@ class JsonBuilder(object):
     @staticmethod
     def json_response(dictionary, Xlabel=DATE):
         # ToDo-Rezwan Add comment as the function is way too convoluted
-        # ToDo-Rezwan make complete Json response rather than dicts
+
         if isinstance(dictionary, dict):
             dictionary_keys = dictionary.keys()
             for key in dict_keys:

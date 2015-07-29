@@ -4,18 +4,17 @@ import time
 from app import db
 from .models import File, RawData, Sensor, Logger, Site
 
-# ToDO [1] Add Try catch blocks
 #
-# ToDO: [5] Using SqlAlchemy version 0.8.4 read this tut http://www.blog.pythonlibrary.org/2012/07/01/a-simple-sqlalchemy-0-7-0-8-tutorial/
-# ToDO: http://docs.sqlalchemy.org/en/rel_0_8/orm/relationships.html#relationship-patterns
-# ToDO: [6] Regular expression to extract data from filename. import re then re.match('regex','input_string')
+# [5] Using SqlAlchemy version 0.8.4 read this tut http://www.blog.pythonlibrary.org/2012/07/01/a-simple-sqlalchemy-0-7-0-8-tutorial/
+# http://docs.sqlalchemy.org/en/rel_0_8/orm/relationships.html#relationship-patterns
+# [6] Regular expression to extract data from filename. import re then re.match('regex','input_string')
 # re.match('regex','input_string').group(1) is serial 2 is year in order
 # (?P<serial>\d\d\d\d)(?P<year>(?:19|20)\d\d)(?P<month>0[1-9]|1[012])(?P<day>0[1-9]|[12][0-9]|3[01])(?P<FileNo>\d*)(?P<extension>\.txt$)
 # Following Reg ex ignores txt extension subject of testing
 # (?P<serial>\d\d\d\d)(?P<year>(?:19|20)\d\d)(?P<month>0[1-9]|1[012])(?P<day>0[1-9]|[12][0-9]|3[01])(?P<FileNo>\d*)
-# ToDo: [7a] http://www.pythoncentral.io/sqlalchemy-association-tables/
-# ToDO: [8] Many to One supports cascade delete without sqllite Pragma foreign_key = ON support
-# ToDO: [9] matplotlib in virtualenv sudo apt-get build-dep python-matplotlib
+#  http://www.pythoncentral.io/sqlalchemy-association-tables/
+# Many to One supports cascade delete without sqllite Pragma foreign_key = ON support
+#  matplotlib in virtualenv sudo apt-get build-dep python-matplotlib
 
 #######################################################################################################################
 
