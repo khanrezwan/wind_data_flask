@@ -267,5 +267,12 @@ class Rawdata_plotter_helper(object):
 
     # Todo-Rezwan Add Monthly 24 Hr view and Monthly 24 Hr view for a range
 
+    @staticmethod
+    def get_Data_Month_24Hr(date, sensor_id):
+        pass
+
+    @staticmethod
+    def get_Data_Month_Range_24Hr(startDate, endDate, sensor_id):
+        pass
     pass
 

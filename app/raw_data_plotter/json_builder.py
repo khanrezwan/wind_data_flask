@@ -53,9 +53,11 @@ class JsonBuilder(object):
             dictionary_keys = dictionary.keys()
             for key in dict_keys:
                 if key not in dictionary_keys:
-                    raise KeyError('Not the expected dictionary')
+                    return jsonify({'error': 'Not the expected dictionary'}), 404
+                    # raise KeyError('Not the expected dictionary')
         else:
-            raise ValueError("the parameter dictionary must be a python dict")
+            return jsonify({'error': 'Not a dictionary'}), 404
+            # raise TypeError("the parameter dictionary must be a python dict")
         query = dictionary['query']
         sensor_id = dictionary['sensor_id']
         date = dictionary['date']
@@ -204,10 +206,10 @@ class JsonBuilder(object):
 
             else:
                 print 'WTF??'
-                return jsonify({'error': 'No Logger in database'}), 404
+                return jsonify({'error': 'No Query result from database'}), 404
                 pass
         else:
-            return sensor, 404 #sensor is string and 404 is not found
+            return jsonify({'error': 'Sensor not found in database'}), 404 #sensor is string and 404 is not found
 
     @staticmethod
     def plot_dictionary_builder(data_list, date_list, keep_date_striing=False):
@@ -250,11 +252,13 @@ class JsonBuilder(object):
         if isinstance(date, list) or isinstance(date, tuple):
             for dt in date:
                 if not isinstance(dt, datetime.datetime):
-                    raise TypeError('date must be of type datetime.datetime')
+                    return jsonify({'error': 'date must be of type datetime.datetime'}), 404
+                    # raise TypeError('date must be of type datetime.datetime')
 
         else:
             if not isinstance(date,datetime.datetime):
-                raise TypeError('date must be of type datetime.datetime')
+                return jsonify({'error': 'date must be of type datetime.datetime'}), 404
+                # raise TypeError('date must be of type datetime.datetime')
 
     @staticmethod
     def sensor_validator(sensor_id):
@@ -267,7 +271,8 @@ class JsonBuilder(object):
         try:
             sensor_id = int(sensor_id)
         except ValueError:
-            raise ValueError("sensor_id must be an integer")
+            return jsonify({'error': '"sensor_id must be an integer'}), 404
+            # raise ValueError("sensor_id must be an integer")
         query = Sensor.query.filter(Sensor.id == sensor_id)
         if query.count() != 0:
             found = True
@@ -291,7 +296,7 @@ class JsonBuilder(object):
                 "ch_min": float("{0:.2f}".format(data_obj.ch_min)),
                 "ch_Avg": float("{0:.2f}".format(data_obj.ch_avg))
             }
-        else: # for None
+        else:  # for None
             return {
                 "ch_max": (data_obj.ch_max),
                 "ch_min": (data_obj.ch_min),

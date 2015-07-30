@@ -2,6 +2,20 @@
  * Created by rezwan on 19/07/15.
  * http://angular-ui.github.io/bootstrap/
  */
+
+    /* ToDo ng-app will send query to ngQueries with following params
+    sensor_id = int. must be sent
+    start_date = json date, use in case of single date or month case, must be sent
+    end_date = json date, optional, for range cases
+
+    Must send by_month or by_date
+    by_month = bool, optional, for plots with months
+    by_date = bool, optional, for plots with dates
+
+    Must send one of following
+    by_timestamp = bool, optional, for 24hr cases
+    show_individual_date_or_month = bool, optional, for single point multiple dates or months
+    * */
 var app = angular.module('myApp', ['ui.bootstrap',"chart.js"]);
 // http://jtblin.github.io/angular-chart.js/#getting_started
 //http://angular-ui.github.io/bootstrap/

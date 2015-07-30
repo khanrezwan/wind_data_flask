@@ -117,6 +117,7 @@ class RawData(db.Model):
                     raise TypeError("Expecting String")
         if not isinstance(file_name, File):
             raise TypeError("Expecting File model")
+        # ToDo-Rezwan older files had different timestamp...try both if both fails then catch exception
         date = datetime.datetime.strptime(getdatalist[0], '%d/%m/%Y %H:%M:%S')  # in dd/mm/yyyy HH (24hr):MM:SS
 
         single_channel = list()  # empty list for raw data of single channel

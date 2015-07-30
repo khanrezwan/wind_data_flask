@@ -54,6 +54,114 @@ def jsonify_date(obj):
     raise TypeError("Type not serializable")
 
 
+@raw_data_plotter.route('/ngQueries', methods=['Get'])
+def get_ng_params():
+    """
+    This is the main route where angular JS will send query string
+    :return: JSON data with response code
+    """
+    print request.query_string
+    try:
+        sensor_id = int(request.args.get('sensor_id'))
+    except TypeError:
+        return make_response(jsonify({'error': 'sensor id must be an integer'}), 404)
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    by_month = (request.args.get('by_month'))
+    by_date = (request.args.get('by_date'))
+    # by_range = (request.args.get('by_range'))
+    by_timestamp = (request.args.get('by_timestamp'))
+    show_individual_date_or_month = (request.args.get('show_individual_date_or_month'))
+    response = jsonify({'error': 'Did not route to any cases'})
+    code = 404
+    try:
+        start_date = datetime.datetime.strptime(start_date, Json_date_obj_pattern) # There must be atleast one Date
+        if end_date:  # enddate may be None
+            end_date = datetime.datetime.strptime(end_date, Json_date_obj_pattern)
+    except ValueError:
+        return make_response(jsonify({'error': 'Not a Java Script Date object'}), 404)
+
+    # routing start
+
+    if not end_date:
+        if by_date is True:  # Routing Single date cases
+            if by_timestamp is True:
+                helper_dict = Rawdata_plotter_helper.get_Data_Date_24Hr(start_date, sensor_id)
+                (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
+            elif by_timestamp is False:
+                helper_dict = Rawdata_plotter_helper.get_Data_Date_Single_Point(start_date, sensor_id)
+                (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
+            else:
+                return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+        elif by_month is True:  # Routing Single month cases
+            if by_timestamp is True:
+                helper_dict = Rawdata_plotter_helper.get_Data_Month_24Hr(start_date, sensor_id)
+                (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
+            elif by_timestamp is False:
+                helper_dict = Rawdata_plotter_helper.get_Data_Month_Single_Point(start_date, sensor_id)
+                (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
+            else:
+                return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+        else:
+            return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+
+    elif start_date and end_date and (end_date >= start_date):
+        if by_date is True: # Routing date range cases
+            if by_timestamp is False:
+                if show_individual_date_or_month is True:
+                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(start_date,end_date,sensor_id)
+                    (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
+                elif show_individual_date_or_month is False:
+                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(sensor_id, end_date, sensor_id)
+                    (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
+                else:
+                    return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+            elif by_timestamp is True:
+                helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_24Hr(start_date, end_date, sensor_id)
+            else:
+                return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+        elif by_month is True: # Routing month range cases
+            if by_timestamp is False:
+                if show_individual_date_or_month is True:
+                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point_for_each_Month(start_date,end_date,sensor_id)
+                    (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
+                elif show_individual_date_or_month is False:
+                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(sensor_id, end_date, sensor_id)
+                    (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
+                else:
+                    return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+            elif by_timestamp is True:
+                helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_24Hr(start_date, end_date, sensor_id)
+            else:
+                return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+
+    else:
+        return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+    return make_response(response, code)
+    # elif not end_date and by_month is True:  # Routing Single month cases
+    #     if by_timestamp is True:
+    #         Rawdata_plotter_helper.get_Data_Month_24Hr(start_date, sensor_id)
+    #     elif by_timestamp is False:
+    #         Rawdata_plotter_helper.get_Data_Month_Single_Point(start_date, sensor_id)
+    #     else:
+    #         return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+
+    # elif start_date and end_date and by_month is True: # Routing month range cases
+    #     if by_timestamp is False:
+    #         if show_individual_date_or_month is True:
+    #             Rawdata_plotter_helper.get_Data_Month_Range_Single_Point_for_each_Month(start_date,end_date,sensor_id)
+    #         elif show_individual_date_or_month is False:
+    #             Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(sensor_id, end_date, sensor_id)
+    #         else:
+    #             return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+    #     elif by_timestamp is True:
+    #         Rawdata_plotter_helper.get_Data_Month_Range_24Hr(start_date, end_date, sensor_id)
+    #     else:
+    #         return make_response(jsonify({'error': 'invalid choice combination'}), 404)
+
+    pass
+
+
 @raw_data_plotter.route('/getLoggers', methods=['Get'])
 def get_loggers():
     logger_list = Logger.query
@@ -101,104 +209,104 @@ def get_sensors_available_dates(sensor_id):
         return jsonify(
             {
                 'success': True,
-                'min_date': jsonify_date(date.first().min),
-                'max_date': jsonify_date(date.first().max)
+                'min_date': JsonBuilder.serialize_date(date.first().min),
+                'max_date': JsonBuilder.serialize_date(date.first().max)
 
             })
 
 
-@raw_data_plotter.route('/getPlotDataDate24Hr', methods=['Get'])
-def get_Plot_Data_Date_24Hr():
-
-    print request.query_string
-
-    sensor_id = int(request.args.get('sensor_id'))
-    date = request.args.get('date')
-    date = '2015-05-1T20:34:05.787Z'
-    try:
-        date = datetime.datetime.strptime(date, Json_date_obj_pattern)
-    except:
-        return make_response(jsonify({'error': 'Not a Java Script Date object'}), 404)
-
-    data_list = RawData.query.filter(RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
-                                     RawData.fk_sensor_id == sensor_id)
-
-    if data_list.count() == 0:
-        return make_response(jsonify({'error': 'No Raw Data object found'}), 404)
-
-    # RawData.query.with_entities(db.func.min(RawData.date_time).label('date')).filter(RawData.fk_sensor_id == sensor_id).first()
-    else:
-        return jsonify(
-            {
-
-                'dataList': [{'data': data.serialize()} for data in data_list.all()],
-                'success': True
-            })
-
-
-@raw_data_plotter.route('/getPlotDataDateSinglePoint', methods=['Get'])
-def get_Plot_Data_Date_Single_Point():
-
-    sensor_id = request.args.get('sensor_id')
-    date = request.args.get('date')
-    date = '2015-05-1T20:34:05.787Z'
-
-    sensor_id = 1
-    try:
-        date = datetime.datetime.strptime(date, Json_date_obj_pattern)
-    except:
-        return make_response(jsonify({'error': 'Not a Java Script Date object'}), 404)
-
-    channel_data = RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
-                                               db.func.avg(RawData.ch_max).label('ch_max'),
-                                               db.func.avg(RawData.ch_avg).label('ch_avg'))\
-        .filter(
-        RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
-        RawData.fk_sensor_id == sensor_id)
-
-    if (channel_data.first().ch_avg is None) or (channel_data.first().ch_max is None) or (channel_data.first().ch_min is None):
-        return make_response(jsonify({'error': 'No data available for that date'}), 404)
-
-    else:
-
-        return jsonify({
-            'ch_avg': "{0:.2f}".format(channel_data.first().ch_avg),
-            'ch_max': "{0:.2f}".format(channel_data.first().ch_max),
-            'ch_min': "{0:.2f}".format(channel_data.first().ch_min),
-            'date': jsonify_date(date),
-            'success': True
-        })
-
-
-@raw_data_plotter.route('/getPlotDataDateRange24Hr', methods=['Get'])
-def get_Plot_Data_Date_Range_24Hr():
-
-    return jsonify({
-
-        'success': True,
-    })
-
-
-@raw_data_plotter.route('/getPlotDataDateRangeSinglePoint', methods=['Get'])
-def get_Plot_Data_Date_Range_Single_Point():
-    return jsonify({
-        'success': True,
-    })
-
-
-@raw_data_plotter.route('/getPlotDataMonth24Hr', methods=['Get'])
-def get_Plot_Data_Month_24Hr():
-    return jsonify({
-        'success': True,
-    })
-
-
-@raw_data_plotter.route('/getPlotDataMonthSinglePoint', methods=['Get'])
-def get_Plot_Data_Month_Single_Point():
-    return jsonify({
-        'success': True,
-    })
-
+# @raw_data_plotter.route('/getPlotDataDate24Hr', methods=['Get'])
+# def get_Plot_Data_Date_24Hr():
+#
+#     print request.query_string
+#
+#     sensor_id = int(request.args.get('sensor_id'))
+#     date = request.args.get('date')
+#     date = '2015-05-1T20:34:05.787Z'
+#     try:
+#         date = datetime.datetime.strptime(date, Json_date_obj_pattern)
+#     except:
+#         return make_response(jsonify({'error': 'Not a Java Script Date object'}), 404)
+#
+#     data_list = RawData.query.filter(RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
+#                                      RawData.fk_sensor_id == sensor_id)
+#
+#     if data_list.count() == 0:
+#         return make_response(jsonify({'error': 'No Raw Data object found'}), 404)
+#
+#     # RawData.query.with_entities(db.func.min(RawData.date_time).label('date')).filter(RawData.fk_sensor_id == sensor_id).first()
+#     else:
+#         return jsonify(
+#             {
+#
+#                 'dataList': [{'data': data.serialize()} for data in data_list.all()],
+#                 'success': True
+#             })
+#
+#
+# @raw_data_plotter.route('/getPlotDataDateSinglePoint', methods=['Get'])
+# def get_Plot_Data_Date_Single_Point():
+#
+#     sensor_id = request.args.get('sensor_id')
+#     date = request.args.get('date')
+#     date = '2015-05-1T20:34:05.787Z'
+#
+#     sensor_id = 1
+#     try:
+#         date = datetime.datetime.strptime(date, Json_date_obj_pattern)
+#     except:
+#         return make_response(jsonify({'error': 'Not a Java Script Date object'}), 404)
+#
+#     channel_data = RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
+#                                                db.func.avg(RawData.ch_max).label('ch_max'),
+#                                                db.func.avg(RawData.ch_avg).label('ch_avg'))\
+#         .filter(
+#         RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
+#         RawData.fk_sensor_id == sensor_id)
+#
+#     if (channel_data.first().ch_avg is None) or (channel_data.first().ch_max is None) or (channel_data.first().ch_min is None):
+#         return make_response(jsonify({'error': 'No data available for that date'}), 404)
+#
+#     else:
+#
+#         return jsonify({
+#             'ch_avg': "{0:.2f}".format(channel_data.first().ch_avg),
+#             'ch_max': "{0:.2f}".format(channel_data.first().ch_max),
+#             'ch_min': "{0:.2f}".format(channel_data.first().ch_min),
+#             'date': jsonify_date(date),
+#             'success': True
+#         })
+#
+#
+# @raw_data_plotter.route('/getPlotDataDateRange24Hr', methods=['Get'])
+# def get_Plot_Data_Date_Range_24Hr():
+#
+#     return jsonify({
+#
+#         'success': True,
+#     })
+#
+#
+# @raw_data_plotter.route('/getPlotDataDateRangeSinglePoint', methods=['Get'])
+# def get_Plot_Data_Date_Range_Single_Point():
+#     return jsonify({
+#         'success': True,
+#     })
+#
+#
+# @raw_data_plotter.route('/getPlotDataMonth24Hr', methods=['Get'])
+# def get_Plot_Data_Month_24Hr():
+#     return jsonify({
+#         'success': True,
+#     })
+#
+#
+# @raw_data_plotter.route('/getPlotDataMonthSinglePoint', methods=['Get'])
+# def get_Plot_Data_Month_Single_Point():
+#     return jsonify({
+#         'success': True,
+#     })
+#
 
 
 @raw_data_plotter.route('/', methods=['Get', 'Post'])
