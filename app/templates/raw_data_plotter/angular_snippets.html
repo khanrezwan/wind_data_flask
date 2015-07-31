@@ -1,0 +1,62 @@
+<h3>Angular JS Tester</h3>
+    <!-- Angular JS App begin-->
+    <div ng-app="myApp" ng-controller="myCtrl"><!-- Angular JS DIV Start -->
+
+        First Name: <input type="text" ng-model="firstName"><br>
+        Last Name: <input type="text" ng-model="lastName"><br>
+
+        <br>
+        {#        Full Name: <span ng-bind="firstName"></span> <span ng-bind="lastName"></span>#}
+        <br> First Name {{ '{{' }} firstName + " " + lastName {{ '}}' }}
+        <button class="btn" ng-click="send_query()">
+            Click Moi
+        </button>
+        <br> <span ng-bind="msg"></span>
+        <ul ng-repeat="logger in logger_list">
+
+            <li ng-repeat="(key, val) in logger"> {{ '{{' }} key {{ '}}' }}: {{ '{{' }} val {{ '}}' }}</li>
+
+
+        </ul>
+        <form method="post">
+            <p> Please Select a Logger <select ng-model="logger_select_value"
+                                               ng-change="get_sensor_list(logger_select_value)">
+                <option ng-repeat="item in logger_list" value="{{ '{{' }} item.logger.id {{ '}}' }}"> {{ '{{' }}
+                    item.logger.serial {{ '}}' }}</option>
+
+            </select></p>
+            <p> Please Select a Sensor
+                <select ng-model="sensor_select_value" ng-change="test_counter(sensor_select_value)">
+                    <option ng-repeat="item in sensor_list" value="{{ '{{' }} item.sensor.id {{ '}}' }}"> {{ '{{' }}
+                        item.sensor.description {{ '}}' }}</option>
+
+                </select></p>
+        </form>
+        <!-- Angular ui date picker -->
+        <p class="input-group">
+            <input type="text" class="form-control col-md-3"
+                   datepicker-popup="MMMM-yyyy"
+                   ng-model="dt" is-open="opened"
+                   datepicker-options="dateOptions"
+                    />
+          <span class="input-group-btn">
+            <button class="btn btn-default" ng-click="open($event)">
+                <i class="glyphicon glyphicon-calendar"></i>
+            </button>
+          </span>
+        </p>
+        <br> {{ '{{' }} dt {{ '}}' }}
+        <datepicker datepicker-mode="'year'" min-mode="month" ng-model="date"></datepicker>
+        <br> {{ '{{' }} date {{ '}}' }}
+        <!-- Angular ui date picker End -->
+
+        <!-- AngularJS Charts Start-->
+    <canvas id="bar" class="chart chart-bar" data="data" labels="labels"></canvas>
+    <!-- AngularJS Charts End-->
+
+    </div> <!-- Angular JS DIV end -->
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/raw_data_plotter/raw_data_plotter.js')+'?v1.01' }}{{ ['213@!z','as!@Z','Ay','aY','Bx','bX','Cw','cW']|random }}{{ ['a1','2b','3c','d4','e5','6f','g7']|random }}"> {# Add some random query string number to bust browser cache #}
+
+    </script>
+    <!-- Angular JS App end -->

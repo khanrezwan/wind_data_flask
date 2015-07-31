@@ -68,7 +68,7 @@ class JsonBuilder(object):
         print sensor, ' ', found
         JsonBuilder.datetime_validator(date)
         if found:
-            y_label_text = 'Channel '+ str(sensor.channel)+': ' + sensor.description + ' @ height ' \
+            y_label_text = 'Channel ' + str(sensor.channel)+': ' + sensor.description + ' @ height ' \
                            + str(sensor.height) + 'm'
             X_label_text = JsonBuilder.extract_x_label_text(Xlabel)
             if isinstance(query, list) and isinstance(date, list) and time_stamp is None:
@@ -105,6 +105,13 @@ class JsonBuilder(object):
                     X_label_text += date.strftime("%Y-%m-%d")
                 # return ([{'X': itemX , 'Y' : JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(time_stamp, query.all())])
                 plot_data = JsonBuilder.plot_dictionary_builder(query.all(), time_stamp, keep_date_striing=True)
+                # X = list()
+                # Y =list()
+                # for data in plot_data:
+                #     X.append(data['X'])
+                #     Y.append(data['Y'])
+                # print X
+                # print Y
                 return jsonify({'plot_data': plot_data,
                                 "y_label": y_label_text,
                                 "x_label": X_label_text,

@@ -29,8 +29,8 @@ def class_tester():
     # query = Rawdata_plotter_helper.get_Data_Date_Single_Point(datetime.datetime(2015, 6, 22), 1)
 
     # query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1),1)
-    query = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 6, 20), 1)
-    # query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1), 20)
+    # query = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 6, 20), 1)
+    query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1), 1)
     # JsonBuilder.json_response(query, Xlabel=JsonBuilder.TIMESTAMP)
     (response, code) = JsonBuilder.json_response(query, Xlabel=JsonBuilder.MONTH)
     return make_response(response, code)
@@ -192,6 +192,24 @@ def get_sensors(logger_id):
             })
 
 
+@raw_data_plotter.route('/getSensorDetails/<int:sensor_id>', methods=['Get'])
+def get_sensor_details(sensor_id):
+    try:
+        sensor_id = int(sensor_id)
+    except ValueError:
+        return make_response(jsonify({'error': 'Sensor id must be an integer'}), 404)
+
+    query = Sensor.query.filter(Sensor.id == sensor_id)
+    if query.count() == 0:
+        return make_response(jsonify({'error': 'No Sensor found'}), 404)
+    else:
+        return jsonify(
+            {
+                'success': True,
+                'sensor': query.first().serialize()
+            })
+
+
 @raw_data_plotter.route('/getAvailableDates/<int:sensor_id>', methods=['Get'])
 def get_sensors_available_dates(sensor_id):
     try:
@@ -328,7 +346,7 @@ def query_test():
         print res.count()
         flash('Count ' + str(res.count()))
         return render_template('raw_data_plotter/query_tester.html', form=form)
-    return render_template('raw_data_plotter/query_tester.html', form=form)
+    return render_template('raw_data_plotter/query_tester.html')
     pass
 
 
