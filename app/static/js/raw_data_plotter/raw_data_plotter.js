@@ -42,6 +42,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     //for flask
     $scope.by_date = false;
     $scope.by_month = false;
+    $scope.enable_start_date = false;
+    $scope.enable_end_date = false;
     $scope.start_date = null;
     $scope.end_date = null;
     $scope.sensor = {};
@@ -49,6 +51,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     //for ng-functions
     $scope.min_date ={};
     $scope.max_date ={};
+    $scope.show_start_date_calendar = false;
+    $scope.show_end_date_calendar = false;
     $scope.sensor_id_from_step_2 = null;
     $scope.logger_list = [];
     $scope.data_list = [];
@@ -182,6 +186,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_step_5 = false;
         $scope.show_button = false;
         $scope.show_plot = false;
+        $scope.enable_start_date = false;
+        $scope.enable_end_date = false;
         if (option.valueOf() == 'by_date')
         {
             $scope.by_date = true;
@@ -207,7 +213,33 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_step_5 = false;
         $scope.show_button = false;
         $scope.show_plot = false;
+        $scope.show_start_date_calendar = false;
+        $scope.show_end_date_calendar =false;
+        //  $scope.enable_start_date = false;
+        //$scope.enable_end_date = false;
         //after step 3b
+         if (option.valueOf() == 'single')
+        {
+            //set up calendar
+             $scope.msg = 'got single';
+             $scope.show_start_date_calendar = true;
+            $scope.show_end_date_calendar =false;
+            $scope.show_step_4 = true;
+        }
+        else if (option.valueOf() == 'range')
+        {
+           //set up calendar
+            $scope.msg = 'got range';
+            $scope.show_start_date_calendar = true;
+            $scope.show_end_date_calendar =true;
+            $scope.show_step_4 = true;
+        }
+        else
+        {
+             $scope.msg = 'got' + option;
+            $scope.show_start_date_calendar = false;
+            $scope.show_end_date_calendar =false;
+        }
     };
 
     $scope.get_maximum_minimum_dates_of_available_data = function(sensor_id)
@@ -221,6 +253,9 @@ app.controller('myCtrl', function ($scope, $http, $window) {
                     $scope.max_date = new Date(data.max_date);
                     //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
                     $scope.msg = 'got min date' + " " + $scope.min_date + " and max Date " + $scope.max_date;
+                     $scope.minDate =  $scope.min_date;
+                    $scope.maxDate =$scope.max_date;
+
                     $scope.show_step_3 = true;
                 } else {
                     $window.alert('Retrieval failed 22');
@@ -237,7 +272,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     $scope.today();
     $scope.date = new Date();
     $scope.clear = function () {
-        $scope.dt = null;
+        $scope.end_date = null;
+        $scope.start_date = null;
     };
 
     // Disable weekend selection
@@ -250,29 +286,34 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     };
     //$scope.toggleMin();
 
-    $scope.open = function ($event) {
+    $scope.open_start = function ($event) {
         $event.preventDefault();
         $event.stopPropagation();
 
-        $scope.opened = true;
+        $scope.opened_start = true;
+    };
+
+    $scope.open_end = function ($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.opened_end = true;
     };
 
     $scope.dateOptions = {
         'year-format': "yyyy",
         'starting-day': 1,
-        'datepicker-mode': "'month'",
-        'min-mode': "month",
-        'showWeeks': "false",
+        'datepicker-mode': "'day'",
+        'min-mode': "day",
+        'showWeeks': "true",
         'show-button-bar': "false",
         'close-on-date-selection': "false",
         'current-text': 'This Month'
-
 
     };
 
     $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate', 'MMMM.yyyy'];
     // $scope.format = $scope.formats[0];
-
 
     //////////////////////////////////////////////////////////////////////////////
 });

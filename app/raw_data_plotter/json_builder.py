@@ -43,8 +43,6 @@ class JsonBuilder(object):
     MONTH = 1
     TIMESTAMP = 2
 
-
-
     @staticmethod
     def json_response(dictionary, Xlabel=DATE):
         # ToDo-Rezwan Add comment as the function is way too convoluted
@@ -62,7 +60,6 @@ class JsonBuilder(object):
         sensor_id = dictionary['sensor_id']
         date = dictionary['date']
         time_stamp = dictionary['time_stamp']
-
 
         sensor, found = JsonBuilder.sensor_validator(sensor_id)
         print sensor, ' ', found

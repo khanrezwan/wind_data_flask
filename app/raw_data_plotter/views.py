@@ -28,11 +28,11 @@ Json_date_obj_pattern = '%Y-%m-%dT%H:%M:%S.%fZ'
 def class_tester():
     # query = Rawdata_plotter_helper.get_Data_Date_Single_Point(datetime.datetime(2015, 6, 22), 1)
 
-    # query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1),1)
-    # query = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 6, 20), 1)
-    query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1), 1)
+    query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(datetime.datetime(2015, 6, 1),datetime.datetime(2015, 6, 30),1)
+    # query = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point_for_each_Month(datetime.datetime(2015, 4, 1), datetime.datetime(2015, 7, 20), 1)
+    #query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1), 1)
     # JsonBuilder.json_response(query, Xlabel=JsonBuilder.TIMESTAMP)
-    (response, code) = JsonBuilder.json_response(query, Xlabel=JsonBuilder.MONTH)
+    (response, code) = JsonBuilder.json_response(query, Xlabel=JsonBuilder.DATE)
     return make_response(response, code)
 # def ajs_test_1():
 #
