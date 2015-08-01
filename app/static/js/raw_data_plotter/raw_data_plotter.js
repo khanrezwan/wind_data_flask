@@ -53,10 +53,37 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     $scope.max_date ={};
     $scope.show_start_date_calendar = false;
     $scope.show_end_date_calendar = false;
+    $scope.date_picker_mode= "\"\'month\'\"";
+    $scope.date_picker_min_mode = "\"month\"";
     $scope.sensor_id_from_step_2 = null;
     $scope.logger_list = [];
     $scope.data_list = [];
     $scope.sensor_list = [];
+
+    $scope.dateOptions_month = {
+        'year-format': "yyyy",
+        'starting-day': 1,
+        'datepicker-mode': "'month'",
+        'min-mode': "month",
+        'showWeeks': "false",
+        //'show-button-bar': "false",
+        'close-on-date-selection': "true"
+        //'current-text': 'This Month'
+
+    };
+
+    $scope.dateOptions_day = {
+        'year-format': "yyyy",
+        'starting-day': 1,
+        'datepicker-mode': "'day'",
+        'min-mode': "day",
+        'showWeeks': "false",
+        //'show-button-bar': "false",
+        'close-on-date-selection': "true"
+        //'current-text': 'This Month'
+
+    };
+
 
     $scope.msg = "Debugging";
     $scope.send_query = function () //Testing query string params for get and data for post
@@ -192,12 +219,14 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         {
             $scope.by_date = true;
             $scope.by_month = false;
+            //$scope.dateOptions = $scope.dateOptions_day;
             // $scope.show_step_4 = true;
         }
         else if (option.valueOf() == 'by_month')
         {
              $scope.by_date = false;
             $scope.by_month = true;
+            //$scope.dateOptions = $scope.dateOptions_month;
             //$scope.show_step_4 = true;
         }
         else
@@ -224,6 +253,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
              $scope.msg = 'got single';
              $scope.show_start_date_calendar = true;
             $scope.show_end_date_calendar =false;
+            $scope.end_date = null;
+            $scope.start_date = null;
             $scope.show_step_4 = true;
         }
         else if (option.valueOf() == 'range')
@@ -232,6 +263,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             $scope.msg = 'got range';
             $scope.show_start_date_calendar = true;
             $scope.show_end_date_calendar =true;
+            $scope.end_date = null;
+            $scope.start_date = null;
             $scope.show_step_4 = true;
         }
         else
@@ -239,6 +272,9 @@ app.controller('myCtrl', function ($scope, $http, $window) {
              $scope.msg = 'got' + option;
             $scope.show_start_date_calendar = false;
             $scope.show_end_date_calendar =false;
+            $scope.end_date = null;
+            $scope.start_date = null;
+            $scope.show_step_4 = false;
         }
     };
 
@@ -266,25 +302,65 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             });
     };
     /////////////////////angular ui date picker example//////////////////////////
-    $scope.today = function () {
-        $scope.dt = new Date();
+    //$scope.start_date = new Date($scope.start_date_ui);
+
+    $scope.update_end_date=function(end_date_ui){
+        var temp_date = new Date(end_date_ui);
+
+        //tried suggested action but did not work https://github.com/angular-ui/bootstrap/issues/2628
+        temp_date.setMinutes( 1440 ); //this is a hard code...date picker always lags one day
+
+        $scope.end_date = temp_date;
+        $scope.show_step_5 = false;
+        $scope.show_button = false;
+        $scope.show_plot = false;
+        // Todo make all step 5 radio value false
     };
-    $scope.today();
-    $scope.date = new Date();
-    $scope.clear = function () {
-        $scope.end_date = null;
-        $scope.start_date = null;
+    $scope.update_start_date=function(start_date_ui){
+        var temp_date = new Date(start_date_ui);
+
+        //tried suggested action but did not work https://github.com/angular-ui/bootstrap/issues/2628
+        temp_date.setMinutes( 1440 ); //this is a hard code...date picker always lags one day
+
+        $scope.start_date = temp_date;
+        $scope.show_step_5 = false;
+        $scope.show_button = false;
+        $scope.show_plot = false;
+        // Todo make all step 5 radio value false
     };
+
+    $scope.validate_date =function()
+    {
+        //validate date
+
+        $scope.show_step_5 = false;
+        $scope.show_button = false;
+        $scope.show_plot = false;
+
+        //Todo after some validation
+         $scope.show_step_5 = true;
+
+        $scope.show_button = true;
+        $scope.show_plot = true;
+
+    };
+    //$scope.today = function () {
+    //    $scope.dt = new Date();
+    //
+    //};
+    //$scope.today();
+    //$scope.date = new Date();
+    //$scope.clear = function () {
+    //    $scope.end_date = null;
+    //    $scope.start_date = null;
+    //};
 
     // Disable weekend selection
     //$scope.disabled = function(date, mode) {
     //  return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
     //};
 
-    $scope.toggleMin = function () {
-        $scope.minDate = $scope.minDate ? null : new Date();
-    };
-    //$scope.toggleMin();
+
 
     $scope.open_start = function ($event) {
         $event.preventDefault();
@@ -300,19 +376,9 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.opened_end = true;
     };
 
-    $scope.dateOptions = {
-        'year-format': "yyyy",
-        'starting-day': 1,
-        'datepicker-mode': "'day'",
-        'min-mode': "day",
-        'showWeeks': "true",
-        'show-button-bar': "false",
-        'close-on-date-selection': "false",
-        'current-text': 'This Month'
 
-    };
 
-    $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate', 'MMMM.yyyy'];
+    //$scope.formats = ['dd-MMMM-yyyy','MMMM.yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
     // $scope.format = $scope.formats[0];
 
     //////////////////////////////////////////////////////////////////////////////

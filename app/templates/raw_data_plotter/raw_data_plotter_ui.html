@@ -1,4 +1,5 @@
-<h3>Angular JS Tester</h3>
+<!-- Todo Make all radio selection like step 5 line 278 to 285-->
+<h3>Raw Data Plotter UI</h3>
 <!-- Angular JS App begin-->
 <div ng-app="myApp" ng-controller="myCtrl"><!-- Angular JS DIV Start -->
     <!--flasher for testing -->
@@ -44,7 +45,10 @@
                             <ul>
                                 <li>Channel #: {{ '{{' }} sensor.channel {{ '}}' }}</li>
                                 <li>Height: {{ '{{' }} sensor.height {{ '}}' }} m</li>
+                                <li>Offset: {{ '{{' }} sensor.offset {{ '}}' }}</li>
                                 <li>Unit: {{ '{{' }} sensor.units {{ '}}' }}</li>
+
+
                             </ul>
 
                         </div>
@@ -133,51 +137,130 @@
             <!-- Step 3 end -->
             <!-- Step 4 start -->
             <div class="panel panel-warning" id="date_picker" ng-show="show_step_4">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Step 4: Select Date(s) or, Month(s)</h3>
-                </div>
-                <div class="row">
-                    <div class="panel-body">
-                        <div class="col-md-6 text-left">
-                            <div ng-show="show_start_date_calendar || show_end_date_calendar">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">From Date or Month</h3>
+                <div ng-show="by_date"> <!-- show calendar with date picker -->
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Step 4: Select Date(s)</h3>
+                    </div>
+                    <div class="row">
 
+                        <div class="panel-body">
+                            <div class="col-md-6 text-left">
+                                <!-- start_date datepicker start -->
+                                <div ng-show="show_start_date_calendar || show_end_date_calendar">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">From Date</h3>
+
+                                    </div>
+                                    <p class="input-group">
+                                        <input type="text" class="form-control col-md-3"
+                                               datepicker-popup="dd-MMMM-yyyy"
+                                               ng-model="start_date_ui" is-open="opened_start" show-button-bar="false"
+                                               min-date="min_date" max-date="max_date"
+                                               ng-change="update_start_date(start_date_ui)"
+                                               datepicker-options="dateOptions_day"
+                                                />
+                                      <span class="input-group-btn">
+                                        <button class="btn btn-default" ng-click="open_start($event)">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                        </button>
+                                      </span>
+                                    </p>
+                                    <!-- start_date datepicker end -->
+                                    <br> {{ '{{' }} start_date {{ '}}' }}
                                 </div>
-                                <p class="input-group">
-                                    <input type="text" class="form-control col-md-3"
-                                           datepicker-popup="dd-MMMM-yyyy"
-                                           ng-model="start_date" is-open="opened_start"
-                                           datepicker-options="dateOptions"
-                                            />
-          <span class="input-group-btn">
-            <button class="btn btn-default" ng-click="open_start($event)">
-                <i class="glyphicon glyphicon-calendar"></i>
-            </button>
-          </span>
-                                </p>
-                                 <br> {{ '{{' }} start_date | date {{ '}}' }}
+                            </div>
+                            <div class="col-md-6 text-left">
+                                <!-- end_date datepicker start -->
+                                <div ng-show="show_end_date_calendar && show_start_date_calendar">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">To Date</h3>
+
+                                    </div>
+                                    <p class="input-group">
+                                        <input type="text" class="form-control col-md-3"
+                                               datepicker-popup="dd-MMMM-yyyy"
+                                               ng-model="end_date_ui" is-open="opened_end"
+                                               datepicker-options="dateOptions_day" min-date="min_date"
+                                               max-date="max_date" show-button-bar="false"
+                                               ng-change="update_end_date(end_date_ui)"
+                                                />
+                                          <span class="input-group-btn">
+                                            <button class="btn btn-default" ng-click="open_end($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                          </span>
+                                    </p>
+                                    <!-- end_date datepicker end -->
+                                    <br> {{ '{{' }} end_date {{ '}}' }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-center">
+                                    <a class="btn btn-lg btn-primary " ng-click="validate_date()"> Next </a></div>
                             </div>
                         </div>
-                        <div class="col-md-6 text-left">
-                            <div ng-show="show_end_date_calendar && show_start_date_calendar">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">To Date or Month</h3>
+                    </div>
+                </div>
+                <div ng-show="by_month"> <!-- show calendar with month picker -->
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Step 4: Select Date(s)</h3>
+                    </div>
+                    <div class="row">
 
+                        <div class="panel-body">
+                            <div class="col-md-6 text-left">
+                                <!-- start_date datepicker start -->
+                                <div ng-show="show_start_date_calendar || show_end_date_calendar">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">From Month</h3>
+
+                                    </div>
+                                    <p class="input-group">
+                                        <input type="text" class="form-control col-md-3"
+                                               datepicker-popup="MMMM-yyyy"
+                                               ng-model="start_date_ui" is-open="opened_start" show-button-bar="false"
+                                               min-date="min_date" max-date="max_date"
+                                               ng-change="update_start_date(start_date_ui)"
+                                               datepicker-options="dateOptions_month"
+                                                />
+                                      <span class="input-group-btn">
+                                        <button class="btn btn-default" ng-click="open_start($event)">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                        </button>
+                                      </span>
+                                    </p>
+                                    <!-- start_date datepicker end -->
+                                    <br> {{ '{{' }} start_date {{ '}}' }}
                                 </div>
-                                <p class="input-group">
-                                    <input type="text" class="form-control col-md-3"
-                                           datepicker-popup="dd-MMMM-yyyy"
-                                           ng-model="end_date" is-open="opened_end"
-                                           datepicker-options="dateOptions"
-                                            />
-          <span class="input-group-btn">
-            <button class="btn btn-default" ng-click="open_end($event)">
-                <i class="glyphicon glyphicon-calendar"></i>
-            </button>
-          </span>
-                                </p>
-                                <br> {{ '{{' }} end_date {{ '}}' }}
+                            </div>
+                            <div class="col-md-6 text-left">
+                                <!-- end_date datepicker start -->
+                                <div ng-show="show_end_date_calendar && show_start_date_calendar">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">To Month</h3>
+
+                                    </div>
+                                    <p class="input-group">
+                                        <input type="text" class="form-control col-md-3"
+                                               datepicker-popup="MMMM-yyyy"
+                                               ng-model="end_date_ui" is-open="opened_end"
+                                               datepicker-options="dateOptions_month" min-date="min_date"
+                                               max-date="max_date" show-button-bar="false"
+                                               ng-change="update_end_date(end_date_ui)"
+                                                />
+                                          <span class="input-group-btn">
+                                            <button class="btn btn-default" ng-click="open_end($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                          </span>
+                                    </p>
+                                    <!-- end_date datepicker end -->
+                                    <br> {{ '{{' }} end_date {{ '}}' }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-center">
+                                    <a class="btn btn-lg btn-primary " ng-click="validate_date()"> Next </a></div>
                             </div>
                         </div>
                     </div>
@@ -191,19 +274,28 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-12 text-left">
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="optradio">Single value</label>
+                        <div class="col-md-12 text-center">
+                            <div class="btn-group">
+                                <label class="btn btn-success" ng-model="radioModel"
+                                       btn-radio="'Single value'">Left</label>
+                                <label class="btn btn-success" ng-model="radioModel"
+                                       btn-radio="'Middle'">Individual</label>
+                                <label class="btn btn-success" ng-model="radioModel"
+                                       btn-radio="'Right'">Timestamp</label>
                             </div>
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="optradio">Individual</label>
-                            </div>
-                            <div class="radio disabled">
-                                <label>
-                                    <input type="radio" name="optradio" disabled="">Timestamp</label>
-                            </div>
+                            <br>{{ '{{' }}radioModel{{ '}}' }}
+                            <!-- <div class="radio">
+                                 <label>
+                                     <input type="radio" name="optradio">Single value</label>
+                             </div>
+                             <div class="radio">
+                                 <label>
+                                     <input type="radio" name="optradio">Individual</label>
+                             </div>
+                             <div class="radio">
+                                 <label>
+                                     <input type="radio" name="optradio">Timestamp</label>
+                             </div>-->
                         </div>
                     </div>
                 </div>
@@ -211,7 +303,10 @@
             <!-- Step 5 end -->
             <div class="text-center" ng-show="show_button">
                 <a class="btn btn-lg btn-primary"><i class="glyphicon glyphicon-eye-open"></i> View Plot</a></div>
+
         </div>
+
+
         <!-- Plot start -->
         <div class="col-md-7">
             <div class="container-fluid" ng-show="show_plot">
@@ -235,6 +330,9 @@
 
 
 <script type="text/javascript" src="
+
+
+
 
 
 
