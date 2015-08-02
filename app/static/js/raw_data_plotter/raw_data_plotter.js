@@ -39,6 +39,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     $scope.show_step_5 = false;
     $scope.show_button = false;
     $scope.show_plot = false;
+    $scope.alerts = [];
     //for flask
     $scope.by_date = false;
     $scope.by_month = false;
@@ -49,11 +50,11 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     $scope.sensor = {};
 
     //for ng-functions
-    $scope.min_date ={};
-    $scope.max_date ={};
+    $scope.min_date = {};
+    $scope.max_date = {};
     $scope.show_start_date_calendar = false;
     $scope.show_end_date_calendar = false;
-    $scope.date_picker_mode= "\"\'month\'\"";
+    $scope.date_picker_mode = "\"\'month\'\"";
     $scope.date_picker_min_mode = "\"month\"";
     $scope.sensor_id_from_step_2 = null;
     $scope.logger_list = [];
@@ -86,15 +87,34 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
 
     $scope.msg = "Debugging";
+    //$scope.send_query = function () //Testing query string params for get and data for post
+    //{
+    //    $http
+    //        .get('getPlotDataDate24Hr', {
+    //            params: {
+    //                sensor_id: $scope.sensor_select_value,
+    //                date: $scope.sensor_select_value
+    //            }
+    //        })
+    //        .success(function (data, status, headers, config) {
+    //            if (data.success) {
+    //
+    //                $scope.data_list = data.dataList;
+    //                //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
+    //                $scope.msg = 'Loaded dataList' + " " + $scope.data_list.length;
+    //            } else {
+    //                $window.alert('Retrieval failed 22');
+    //            }
+    //        })
+    //        .error(function (data, status, headers, config) {
+    //            $window.alert('Retrieval failed');
+    //        });
+    //
+    //};
     $scope.send_query = function () //Testing query string params for get and data for post
     {
         $http
-            .get('getPlotDataDate24Hr', {
-                params: {
-                    sensor_id: $scope.sensor_select_value,
-                    date: $scope.sensor_select_value
-                }
-            })
+            .get('test_strings', {params: {sensor_id: $scope.sensor_select_value, date: null}})
             .success(function (data, status, headers, config) {
                 if (data.success) {
 
@@ -207,7 +227,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             });
 
     };
-    $scope.option_month_or_date = function(option){
+    $scope.option_month_or_date = function (option) {
         //step 3a
         $scope.show_step_4 = false;
         $scope.show_step_5 = false;
@@ -215,71 +235,63 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_plot = false;
         $scope.enable_start_date = false;
         $scope.enable_end_date = false;
-        if (option.valueOf() == 'by_date')
-        {
+        if (option.valueOf() == 'by_date') {
             $scope.by_date = true;
             $scope.by_month = false;
             //$scope.dateOptions = $scope.dateOptions_day;
             // $scope.show_step_4 = true;
         }
-        else if (option.valueOf() == 'by_month')
-        {
-             $scope.by_date = false;
+        else if (option.valueOf() == 'by_month') {
+            $scope.by_date = false;
             $scope.by_month = true;
             //$scope.dateOptions = $scope.dateOptions_month;
             //$scope.show_step_4 = true;
         }
-        else
-        {
-             $scope.by_date = false;
+        else {
+            $scope.by_date = false;
             $scope.by_month = false;
         }
     };
 
-    $scope.option_single_or_range = function(option)
-    {
+    $scope.option_single_or_range = function (option) {
         $scope.show_step_4 = false;
         $scope.show_step_5 = false;
         $scope.show_button = false;
         $scope.show_plot = false;
         $scope.show_start_date_calendar = false;
-        $scope.show_end_date_calendar =false;
+        $scope.show_end_date_calendar = false;
         //  $scope.enable_start_date = false;
         //$scope.enable_end_date = false;
         //after step 3b
-         if (option.valueOf() == 'single')
-        {
+        if (option.valueOf() == 'single') {
             //set up calendar
-             $scope.msg = 'got single';
-             $scope.show_start_date_calendar = true;
-            $scope.show_end_date_calendar =false;
+            $scope.msg = 'got single';
+            $scope.show_start_date_calendar = true;
+            $scope.show_end_date_calendar = false;
             $scope.end_date = null;
             $scope.start_date = null;
             $scope.show_step_4 = true;
         }
-        else if (option.valueOf() == 'range')
-        {
-           //set up calendar
+        else if (option.valueOf() == 'range') {
+            //set up calendar
             $scope.msg = 'got range';
             $scope.show_start_date_calendar = true;
-            $scope.show_end_date_calendar =true;
+            $scope.show_end_date_calendar = true;
             $scope.end_date = null;
             $scope.start_date = null;
             $scope.show_step_4 = true;
         }
-        else
-        {
-             $scope.msg = 'got' + option;
+        else {
+            $scope.msg = 'got' + option;
             $scope.show_start_date_calendar = false;
-            $scope.show_end_date_calendar =false;
+            $scope.show_end_date_calendar = false;
             $scope.end_date = null;
             $scope.start_date = null;
             $scope.show_step_4 = false;
         }
     };
 
-    $scope.get_maximum_minimum_dates_of_available_data = function(sensor_id)
-    {
+    $scope.get_maximum_minimum_dates_of_available_data = function (sensor_id) {
         $http
             .get('getAvailableDates/' + sensor_id)
             .success(function (data, status, headers, config) {
@@ -289,8 +301,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
                     $scope.max_date = new Date(data.max_date);
                     //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
                     $scope.msg = 'got min date' + " " + $scope.min_date + " and max Date " + $scope.max_date;
-                     $scope.minDate =  $scope.min_date;
-                    $scope.maxDate =$scope.max_date;
+                    $scope.minDate = $scope.min_date;
+                    $scope.maxDate = $scope.max_date;
 
                     $scope.show_step_3 = true;
                 } else {
@@ -304,11 +316,11 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     /////////////////////angular ui date picker example//////////////////////////
     //$scope.start_date = new Date($scope.start_date_ui);
 
-    $scope.update_end_date=function(end_date_ui){
+    $scope.update_end_date = function (end_date_ui) {
         var temp_date = new Date(end_date_ui);
 
         //tried suggested action but did not work https://github.com/angular-ui/bootstrap/issues/2628
-        temp_date.setMinutes( 1440 ); //this is a hard code...date picker always lags one day
+        temp_date.setMinutes(1440); //this is a hard code...date picker always lags one day
 
         $scope.end_date = temp_date;
         $scope.show_step_5 = false;
@@ -316,11 +328,11 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_plot = false;
         // Todo make all step 5 radio value false
     };
-    $scope.update_start_date=function(start_date_ui){
+    $scope.update_start_date = function (start_date_ui) {
         var temp_date = new Date(start_date_ui);
 
         //tried suggested action but did not work https://github.com/angular-ui/bootstrap/issues/2628
-        temp_date.setMinutes( 1440 ); //this is a hard code...date picker always lags one day
+        temp_date.setMinutes(1440); //this is a hard code...date picker always lags one day
 
         $scope.start_date = temp_date;
         $scope.show_step_5 = false;
@@ -328,9 +340,10 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_plot = false;
         // Todo make all step 5 radio value false
     };
-
-    $scope.validate_date =function()
-    {
+    $scope.closeAlert = function (index) {
+        $scope.alerts.splice(index, 1);
+    };
+    $scope.validate_date = function () {
         //validate date
 
         $scope.show_step_5 = false;
@@ -338,10 +351,25 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_plot = false;
 
         //Todo after some validation
-         $scope.show_step_5 = true;
+        if ($scope.show_end_date_calendar && $scope.start_date && $scope.end_date) {
+            if ($scope.end_date >= $scope.start_date) {
+                $scope.show_step_5 = true;
+            }
+            else {
 
-        $scope.show_button = true;
-        $scope.show_plot = true;
+                $scope.alerts.push({type: 'danger', msg: 'From date must be earlier than To date.'});
+            }
+        }
+        else if ($scope.start_date && !$scope.show_end_date_calendar) {
+            $scope.end_date = null;
+            $scope.show_step_5 = true;
+        }
+        else {
+
+            $scope.alerts.push({type: 'danger', msg: 'please set dates'});
+        }
+        //$scope.show_button = true;
+        //$scope.show_plot = true;
 
     };
     //$scope.today = function () {
@@ -361,7 +389,6 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     //};
 
 
-
     $scope.open_start = function ($event) {
         $event.preventDefault();
         $event.stopPropagation();
@@ -375,7 +402,6 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
         $scope.opened_end = true;
     };
-
 
 
     //$scope.formats = ['dd-MMMM-yyyy','MMMM.yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];

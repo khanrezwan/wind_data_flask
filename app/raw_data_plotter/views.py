@@ -53,7 +53,13 @@ def jsonify_date(obj):
         return serial
     raise TypeError("Type not serializable")
 
-
+def string_to_boolean(obj):
+    if obj == 'true':
+        return True
+    elif obj == 'false':
+        return False
+    else:
+        raise ValueError('Did not receive \'true\' or \'false\'')
 @raw_data_plotter.route('/ngQueries', methods=['Get'])
 def get_ng_params():
     """
@@ -68,14 +74,22 @@ def get_ng_params():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     by_month = (request.args.get('by_month'))
+    if by_month:
+        by_month = string_to_boolean(by_month)
     by_date = (request.args.get('by_date'))
+    if by_date:
+        by_date = string_to_boolean(by_date)
     # by_range = (request.args.get('by_range'))
     by_timestamp = (request.args.get('by_timestamp'))
+    if by_timestamp:
+        by_timestamp = string_to_boolean(by_timestamp)
     show_individual_date_or_month = (request.args.get('show_individual_date_or_month'))
+    if show_individual_date_or_month:
+        show_individual_date_or_month = string_to_boolean(show_individual_date_or_month)
     response = jsonify({'error': 'Did not route to any cases'})
     code = 404
     try:
-        start_date = datetime.datetime.strptime(start_date, Json_date_obj_pattern) # There must be atleast one Date
+        start_date = datetime.datetime.strptime(start_date, Json_date_obj_pattern) # There must be at least one Date
         if end_date:  # enddate may be None
             end_date = datetime.datetime.strptime(end_date, Json_date_obj_pattern)
     except ValueError:
@@ -232,7 +246,14 @@ def get_sensors_available_dates(sensor_id):
 
             })
 
-
+@raw_data_plotter.route('/test_strings', methods=['Get'])
+def testing_query():
+    print request.query_string
+    date = (request.args.get('date'))
+    if date:
+        date = string_to_boolean(date)
+    print date
+    return make_response(jsonify({'success': True}), 200)
 # @raw_data_plotter.route('/getPlotDataDate24Hr', methods=['Get'])
 # def get_Plot_Data_Date_24Hr():
 #

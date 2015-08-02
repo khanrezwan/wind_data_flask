@@ -255,7 +255,6 @@ class Rawdata_plotter_helper(object):
                     query_list.append(query)
                     month_list.append(dt)
 
-
                 # return query_list, month_list
                 return Rawdata_plotter_helper.dictionary_builder(query_list, date=month_list, sensor_id=sensor_id)
             else:
@@ -269,6 +268,18 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Month_24Hr(date, sensor_id):
+        pass
+
+    @staticmethod
+    def get_Data_Month_Range_Single_Point_for_each_Day(startDate, endDate, sensor_id):
+        # Todo call where startdate is 1st day stardate month and end date is last day of endday monthRawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date()
+
+        pass
+
+    @staticmethod
+    def get_Data_Month_Single_Point_for_each_Day(date, sensor_id):
+        # Todo call where date is 1st day stardate month and end date is last day of date month Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date()
+
         pass
 
     @staticmethod

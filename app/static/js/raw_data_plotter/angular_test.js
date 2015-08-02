@@ -42,7 +42,7 @@ app.controller('myCtrl',function($scope, $http, $window) {
     $scope.send_query = function() //Testing query string params for get and data for post
     {
         $http
-            .get('getPlotDataDate24Hr',{params:{sensor_id:$scope.sensor_select_value, date: $scope.sensor_select_value}})
+            .get('test_strings',{params:{sensor_id:$scope.sensor_select_value, date: null}})
             .success(function(data, status, headers, config) {
                 if (data.success) {
 
@@ -58,6 +58,7 @@ app.controller('myCtrl',function($scope, $http, $window) {
             });
 
     };
+
     $scope.init_logger = function(){
         $scope.msg = "inside send to loggerlist";
         $http
