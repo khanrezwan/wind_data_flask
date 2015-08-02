@@ -161,7 +161,7 @@ class Rawdata_plotter_helper(object):
                 query_list = list()
                 date_list = list()
                 for dt in rrule.rrule(rrule.DAILY, dtstart=startDate,until=endDate):
-                    res = Rawdata_plotter_helper.get_Data_Date_Single_Point(dt,sensor_id)
+                    res = Rawdata_plotter_helper.get_Data_Date_Single_Point(dt, sensor_id)
                     query = res['query']
                     query_list.append(query)
                     date_list.append(dt)
@@ -268,10 +268,34 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Month_24Hr(date, sensor_id):
+        if isinstance(date, datetime.datetime):
+            try:
+                sensor_id = int(sensor_id)
+            except ValueError:
+                raise ValueError('sensor_id must be an integer')
+
+            (weekday_of_first_day_month, end_date_month) = calendar.monthrange(date.year, date.month)
+
+            start_date = datetime.datetime(date.year, date.month, 1)
+            # print type(start_date)
+            end_date = datetime.datetime(date.year, date.month, end_date_month)
+            res = Rawdata_plotter_helper.get_Data_Date_Range_24Hr(start_date, end_date, sensor_id)
+            # print res
+            query = res['query']
+           # #test code start
+           #  print 'count ', query.count()
+           #  print 'ch_max ', query.first().ch_max
+           #  print 'ch_min ', query.first().ch_min
+           #  print 'ch_avg ', query.first().ch_avg
+           #  #test code end]
+            return res
+        else:
+            raise TypeError('date must be of type datetime.datetime')
         pass
 
     @staticmethod
     def get_Data_Month_Range_Single_Point_for_each_Day(startDate, endDate, sensor_id):
+
         # Todo call where startdate is 1st day stardate month and end date is last day of endday monthRawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date()
 
         pass
@@ -279,11 +303,53 @@ class Rawdata_plotter_helper(object):
     @staticmethod
     def get_Data_Month_Single_Point_for_each_Day(date, sensor_id):
         # Todo call where date is 1st day stardate month and end date is last day of date month Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date()
+        if isinstance(date, datetime.datetime):
+            try:
+                sensor_id = int(sensor_id)
+            except ValueError:
+                raise ValueError('sensor_id must be an integer')
 
+            (weekday_of_first_day_month, end_date_month) = calendar.monthrange(date.year, date.month)
+
+            start_date = datetime.datetime(date.year, date.month, 1)
+            # print type(start_date)
+            end_date = datetime.datetime(date.year, date.month, end_date_month)
+
+            res = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(start_date, end_date, sensor_id)
+            # print res
+            query = res['query']
+           # #test code start
+           #  print 'count ', query.count()
+           #  print 'ch_max ', query.first().ch_max
+           #  print 'ch_min ', query.first().ch_min
+           #  print 'ch_avg ', query.first().ch_avg
+           #  #test code end]
+            return res
+        else:
+            raise TypeError('date must be of type datetime.datetime')
+        pass
         pass
 
     @staticmethod
     def get_Data_Month_Range_24Hr(startDate, endDate, sensor_id):
+        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
+            if endDate >= startDate:
+                try:
+                    sensor_id = int(sensor_id)
+                except ValueError:
+                    raise ValueError('sensor_id must be an integer')
+                (weekday_of_first_day_month, end_date_month) = calendar.monthrange(endDate.year, endDate.month)
+
+                start_date = datetime.datetime(startDate.year, startDate.month, 1)
+                # print type(start_date)
+                end_date = datetime.datetime(endDate.year, endDate.month, end_date_month)
+                return Rawdata_plotter_helper.get_Data_Date_Range_24Hr(start_date, end_date, sensor_id)
+            else:
+                raise ValueError('End date must be greater than or equal to start date')
+        else:
+            raise TypeError('date must be of type datetime.datetime')
+
         pass
+
     pass
 

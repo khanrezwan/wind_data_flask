@@ -22,14 +22,17 @@ var app = angular.module('myApp', ['ui.bootstrap', "chart.js"]);
 app.controller('myCtrl', function ($scope, $http, $window) {
 
 
-    $scope.labels = ['2006', '2007', '2008', '2009', '2010', '2011', '2012'];
-    $scope.series = ['Series A', 'Series B'];
+    $scope.labels = ['0:00','0:10','0:20'];
+    $scope.series = ['Series A'];
 
 
     $scope.data = [
-        [65, 59, 80, 81, 56, 55, 40],
-        [28, 48, 40, 19, 86, 27, 90]
-    ];
+        [1.2,1.3,1.4]
+    ]; //list of list
+
+    //$scope.labels = ['0:00','0:10','0:20'];//X
+    //$scope.series = [1.2,1.3,1.4];//Series name
+    //$scope.data = [ ]; //Y
 
     //ui panel for ng-show
     $scope.show_step_1 = true;
@@ -47,6 +50,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     $scope.enable_end_date = false;
     $scope.start_date = null;
     $scope.end_date = null;
+    $scope.by_timestamp = false;
+    $scope.show_individual_date_or_month = false;
     $scope.sensor = {};
 
     //for ng-functions
@@ -54,8 +59,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     $scope.max_date = {};
     $scope.show_start_date_calendar = false;
     $scope.show_end_date_calendar = false;
-    $scope.date_picker_mode = "\"\'month\'\"";
-    $scope.date_picker_min_mode = "\"month\"";
+
     $scope.sensor_id_from_step_2 = null;
     $scope.logger_list = [];
     $scope.data_list = [];
@@ -67,10 +71,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         'datepicker-mode': "'month'",
         'min-mode': "month",
         'showWeeks': "false",
-        //'show-button-bar': "false",
-        'close-on-date-selection': "true"
-        //'current-text': 'This Month'
-
+         'close-on-date-selection': "true"
     };
 
     $scope.dateOptions_day = {
@@ -79,48 +80,83 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         'datepicker-mode': "'day'",
         'min-mode': "day",
         'showWeeks': "false",
-        //'show-button-bar': "false",
         'close-on-date-selection': "true"
-        //'current-text': 'This Month'
-
     };
 
 
     $scope.msg = "Debugging";
-    //$scope.send_query = function () //Testing query string params for get and data for post
-    //{
-    //    $http
-    //        .get('getPlotDataDate24Hr', {
-    //            params: {
-    //                sensor_id: $scope.sensor_select_value,
-    //                date: $scope.sensor_select_value
-    //            }
-    //        })
-    //        .success(function (data, status, headers, config) {
-    //            if (data.success) {
-    //
-    //                $scope.data_list = data.dataList;
-    //                //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
-    //                $scope.msg = 'Loaded dataList' + " " + $scope.data_list.length;
-    //            } else {
-    //                $window.alert('Retrieval failed 22');
-    //            }
-    //        })
-    //        .error(function (data, status, headers, config) {
-    //            $window.alert('Retrieval failed');
-    //        });
-    //
-    //};
+    $scope.reset_controller_variables = function () {
+        $scope.init_logger();
+        //ui panel for ng-show
+        $scope.show_step_1 = true;
+        $scope.show_step_2 = false;
+        $scope.show_step_3 = false;
+        $scope.show_step_4 = false;
+        $scope.show_step_5 = false;
+        $scope.show_button = false;
+        $scope.show_plot = false;
+        $scope.alerts = [];
+        //for flask
+        $scope.by_date = false;
+        $scope.by_month = false;
+        $scope.enable_start_date = false;
+        $scope.enable_end_date = false;
+        $scope.start_date = null;
+        $scope.end_date = null;
+        $scope.sensor = {};
+        $scope.by_timestamp = false;
+        $scope.show_individual_date_or_month = false;
+
+        //for ng-functions
+        $scope.min_date = {};
+        $scope.max_date = {};
+        $scope.show_start_date_calendar = false;
+        $scope.show_end_date_calendar = false;
+
+        $scope.sensor_id_from_step_2 = null;
+        $scope.logger_list = [];
+        $scope.data_list = [];
+        $scope.sensor_list = [];
+
+        //for chart
+        $scope.labels = [];//X
+        $scope.series = [];//Series name
+        $scope.data = [ ]; //Y
+    };
+
+   /* sensor_id = int. must be sent
+ start_date = json date, use in case of single date or month case, must be sent
+ end_date = json date, optional, for range cases
+
+ Must send by_month or by_date
+ by_month = bool, optional, for plots with months
+ by_date = bool, optional, for plots with dates
+
+ Must send one of following
+ by_timestamp = bool, optional, for 24hr cases
+ show_individual_date_or_month = bool, optional, for single point multiple dates or months
+    * */
     $scope.send_query = function () //Testing query string params for get and data for post
     {
         $http
-            .get('test_strings', {params: {sensor_id: $scope.sensor_select_value, date: null}})
+            .get('ngQueries', {params:
+            {
+                sensor_id: $scope.sensor.id,
+                start_date: $scope.start_date,
+                end_date: $scope.end_date,
+                by_month: $scope.by_month,
+                by_date: $scope.by_date,
+                by_timestamp: $scope.by_timestamp,
+                show_individual_date_or_month: $scope.show_individual_date_or_month
+            }
+            })
             .success(function (data, status, headers, config) {
                 if (data.success) {
 
-                    $scope.data_list = data.dataList;
+                    $scope.data_list = data.plot_data;
+                    $scope.process_plot_data(data);
                     //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
-                    $scope.msg = 'Loaded dataList' + " " + $scope.data_list.length;
+                    //$scope.msg = 'Loaded dataList' + " " + data.plot_data.length;
                 } else {
                     $window.alert('Retrieval failed 22');
                 }
@@ -129,6 +165,42 @@ app.controller('myCtrl', function ($scope, $http, $window) {
                 $window.alert('Retrieval failed');
             });
 
+    };
+    $scope.process_plot_data=function(data)
+    {
+         $scope.msg = 'Loaded dataList' + " " + data.plot_data.length;
+        //var count =0;
+        var temp_X = [];
+        var temp_Y = [];
+        var display = '';
+        for (var i=0;i<data.plot_data.length;i++)
+        {
+            display = display + " "+ data.plot_data[i].Y.ch_avg;
+            temp_X.push(data.plot_data[i].X);
+            temp_Y.push(parseFloat(data.plot_data[i].Y.ch_avg));
+        }
+
+        for (var i = 0; i<temp_X.length;i++)
+        {
+             display = display + " X = "+ temp_X[i] +" Y = "+ temp_Y[i];
+        }
+        $scope.msg = display;
+        //{
+        //   temp_X.push(data.plot_data[i].X);
+        //    //console.log(item.X);
+        //    temp_Y.push(data.plot_data[i].Y.ch_avg);
+        //    count = count+1;
+        //    //$scope.data.push(item.Y.ch_avg);
+        //}
+        //$scope.labels = (temp_X);
+        //$scope.data = (temp_Y);
+        //$scope.series.push(data.y_label);
+        //display ='';
+        //for (var i = 0; i<labels.length;i++)
+        //{
+        //     display = display + " label = "+ $scope.labels[i] +" data = "+ $scope.data[i];
+        //}
+        $scope.show_plot = true;
     };
     $scope.init_logger = function () {
         $scope.msg = "inside send to loggerlist";
@@ -149,25 +221,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             });
     };
     $scope.init_logger();
-    //$scope.some_func = function () {
-    //    console.log(angular.element(document.getElementById('datetimepicker10')));
-    //};
-    ////$scope.some_func();
-    //$scope.send_to_flask = function (n) {
-    //    $scope.msg = "inside send to flask";
-    //    $http
-    //        .get('test_ret/' + n)
-    //        .success(function (data, status, headers, config) {
-    //            if (data.success) {
-    //                $scope.msg = data.todoList;
-    //            } else {
-    //                $window.alert('Retrieval failed 22');
-    //            }
-    //        })
-    //        .error(function (data, status, headers, config) {
-    //            $window.alert('Retrieval failed');
-    //        });
-    //};
+
 
     $scope.get_sensor_list = function (logger_id) {
         //step 1
@@ -235,6 +289,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_plot = false;
         $scope.enable_start_date = false;
         $scope.enable_end_date = false;
+        $scope.end_date = null;
+        $scope.start_date = null;
         if (option.valueOf() == 'by_date') {
             $scope.by_date = true;
             $scope.by_month = false;
@@ -313,8 +369,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
                 $window.alert('Retrieval failed');
             });
     };
-    /////////////////////angular ui date picker example//////////////////////////
-    //$scope.start_date = new Date($scope.start_date_ui);
+    /////////////////////angular ui date picker functions//////////////////////////
+
 
     $scope.update_end_date = function (end_date_ui) {
         var temp_date = new Date(end_date_ui);
@@ -340,9 +396,11 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_plot = false;
         // Todo make all step 5 radio value false
     };
+
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
     };
+
     $scope.validate_date = function () {
         //validate date
 
@@ -372,21 +430,43 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         //$scope.show_plot = true;
 
     };
-    //$scope.today = function () {
-    //    $scope.dt = new Date();
-    //
-    //};
-    //$scope.today();
-    //$scope.date = new Date();
-    //$scope.clear = function () {
-    //    $scope.end_date = null;
-    //    $scope.start_date = null;
-    //};
 
-    // Disable weekend selection
-    //$scope.disabled = function(date, mode) {
-    //  return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
-    //};
+    $scope.option_plot_type=function(option_value)
+    {
+        //step 5
+        //$scope.show_step_5 = false;
+        $scope.show_button = false;
+        $scope.show_plot = false;
+        $scope.by_timestamp = false;
+        $scope.show_individual_date_or_month = false;
+        if (option_value.valueOf()=='singlevalue')
+        {
+            $scope.by_timestamp = false;
+            $scope.show_individual_date_or_month = false;
+            $scope.show_button = true;
+        }
+        else if (option_value.valueOf()=='individual')
+        {
+            $scope.by_timestamp = false;
+            $scope.show_individual_date_or_month = true;
+            $scope.show_button = true;
+        }
+        else if (option_value.valueOf()=='timestamp')
+        {
+            $scope.by_timestamp = true;
+            $scope.show_individual_date_or_month = false;
+            $scope.show_button = true;
+        }
+        else
+        {
+            $scope.msg = 'got' + option_value;
+            $scope.show_step_5 = false;
+            $scope.show_button = false;
+            $scope.show_plot = false;
+            $scope.by_timestamp = false;
+            $scope.show_individual_date_or_month = false;
+        }
+    };
 
 
     $scope.open_start = function ($event) {

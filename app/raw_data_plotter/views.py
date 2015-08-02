@@ -27,12 +27,12 @@ Json_date_obj_pattern = '%Y-%m-%dT%H:%M:%S.%fZ'
 # Testing Rawdata_plotter helper class
 def class_tester():
     # query = Rawdata_plotter_helper.get_Data_Date_Single_Point(datetime.datetime(2015, 6, 22), 1)
-
-    query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(datetime.datetime(2015, 6, 1),datetime.datetime(2015, 6, 30),1)
+    query =Rawdata_plotter_helper.get_Data_Month_Range_24Hr(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 6, 1), 1)
+    # query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(datetime.datetime(2015, 6, 1),datetime.datetime(2015, 6, 30),1)
     # query = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point_for_each_Month(datetime.datetime(2015, 4, 1), datetime.datetime(2015, 7, 20), 1)
     #query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1), 1)
     # JsonBuilder.json_response(query, Xlabel=JsonBuilder.TIMESTAMP)
-    (response, code) = JsonBuilder.json_response(query, Xlabel=JsonBuilder.DATE)
+    (response, code) = JsonBuilder.json_response(query, Xlabel=JsonBuilder.MONTH)
     return make_response(response, code)
 # def ajs_test_1():
 #
@@ -108,44 +108,52 @@ def get_ng_params():
             else:
                 return make_response(jsonify({'error': 'invalid choice combination'}), 404)
         elif by_month is True:  # Routing Single month cases
-            if by_timestamp is True:
+            if by_timestamp is False:
+                if show_individual_date_or_month is True:
+                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Single_Point_for_each_Day(start_date, sensor_id)
+                    (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)  # Todo test
+
+                elif show_individual_date_or_month is False:
+                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Single_Point(start_date, sensor_id)
+                    (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
+            elif by_timestamp is True:
                 helper_dict = Rawdata_plotter_helper.get_Data_Month_24Hr(start_date, sensor_id)
                 (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
-            elif by_timestamp is False:
-                helper_dict = Rawdata_plotter_helper.get_Data_Month_Single_Point(start_date, sensor_id)
-                (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
+
             else:
                 return make_response(jsonify({'error': 'invalid choice combination'}), 404)
         else:
             return make_response(jsonify({'error': 'invalid choice combination'}), 404)
 
     elif start_date and end_date and (end_date >= start_date):
-        if by_date is True: # Routing date range cases
+        if by_date is True:  # Routing date range cases
             if by_timestamp is False:
                 if show_individual_date_or_month is True:
-                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(start_date,end_date,sensor_id)
+                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(start_date, end_date, sensor_id)
                     (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
                 elif show_individual_date_or_month is False:
-                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(sensor_id, end_date, sensor_id)
+                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(start_date, end_date, sensor_id)
                     (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
                 else:
                     return make_response(jsonify({'error': 'invalid choice combination'}), 404)
             elif by_timestamp is True:
                 helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_24Hr(start_date, end_date, sensor_id)
+                (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
             else:
                 return make_response(jsonify({'error': 'invalid choice combination'}), 404)
-        elif by_month is True: # Routing month range cases
+        elif by_month is True:  # Routing month range cases
             if by_timestamp is False:
                 if show_individual_date_or_month is True:
                     helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point_for_each_Month(start_date,end_date,sensor_id)
                     (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
                 elif show_individual_date_or_month is False:
-                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(sensor_id, end_date, sensor_id)
+                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(start_date, end_date, sensor_id)
                     (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
                 else:
                     return make_response(jsonify({'error': 'invalid choice combination'}), 404)
             elif by_timestamp is True:
                 helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_24Hr(start_date, end_date, sensor_id)
+                (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
             else:
                 return make_response(jsonify({'error': 'invalid choice combination'}), 404)
 

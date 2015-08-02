@@ -24,13 +24,13 @@ class JsonBuilder(object):
 
             "xy":
             {
-                "x":
+                "Y":
                 {
                     "ch_max": 8.11,
                     "ch_min": 5.2,
                     "ch_avg": 7.0
                 },
-                "y": "2015-05-1T20:34:05.787Z" / "00:00" / "January"
+                "X": "2015-05-1T20:34:05.787Z" / "00:00" / "January"
             }
             },
             ...
@@ -62,156 +62,160 @@ class JsonBuilder(object):
         time_stamp = dictionary['time_stamp']
 
         sensor, found = JsonBuilder.sensor_validator(sensor_id)
-        print sensor, ' ', found
+        # print sensor, ' ', found
         JsonBuilder.datetime_validator(date)
         if found:
             y_label_text = 'Channel ' + str(sensor.channel)+': ' + sensor.description + ' @ height ' \
                            + str(sensor.height) + 'm'
             X_label_text = JsonBuilder.extract_x_label_text(Xlabel)
-            if isinstance(query, list) and isinstance(date, list) and time_stamp is None:
-                # get_Data_Date_Range_Single_Point_for_each_Date(startDate, endDate, sensor_id)
-                # get_Data_Month_Range_Single_Point_for_each_Month
-                query_list = list()
+            if isinstance(query, list):
+                if isinstance(date, list) and time_stamp is None:
+                    # get_Data_Date_Range_Single_Point_for_each_Date(startDate, endDate, sensor_id)
+                    # get_Data_Month_Range_Single_Point_for_each_Month
+                    query_list = list()
 
-                for q in query:
-                    query_list.append(q.first())
-                # print 'in first if'
-                if Xlabel == JsonBuilder.MONTH:
+                    for q in query:
+                        query_list.append(q.first())
+                    # print 'in first if'
+                    if Xlabel == JsonBuilder.MONTH:
+                        date_list = list()
+                        for dt in date:
+                            date_list.append(JsonBuilder.extract_month_from_date(dt))
+                        plot_data = JsonBuilder.plot_dictionary_builder(query_list, date_list, keep_date_striing=True)
+                        return jsonify({'plot_data': plot_data,
+                                        "y_label": y_label_text,
+                                        "x_label": X_label_text,
+                                        "success": True}), 200
+                    else:
+                        plot_data = JsonBuilder.plot_dictionary_builder(query_list, date)
+                        return jsonify({'plot_data': plot_data,
+                                        "y_label": y_label_text,
+                                        "x_label": X_label_text,
+                                        "success": True}), 200
+                elif isinstance(date, tuple) and isinstance(time_stamp, list):
+                    # get_Data_Date_Range_24Hr(startDate, endDate, sensor_id)
+                    # get_Data_Month_Range_24Hr(startDate, endDate, sensor_id) to b implemented
+                    print 'in 4th if'
+                    query_list = list()
+
+                    date_from_to = 'From '
+                    if Xlabel == JsonBuilder.MONTH:
+                        count = 1
+                        for item in date:
+                            date_from_to += JsonBuilder.extract_month_from_date(item)
+                            if count < date.__len__():
+                                date_from_to += ' to ' #append to between two dates
+                            count += 1
+                        X_label_text += date_from_to
+                    else:
+                        count = 1
+                        for item in date:
+                            date_from_to += item.strftime("%Y-%m-%d")
+                            if count < date.__len__():
+                                date_from_to += ' to ' #append to between two dates
+                            count += 1
+                        X_label_text += date_from_to
+
+                    for q in query:
+                        query_list.append(q.first())
+
+                    # return ([{'X': itemX , 'Y' : JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(time_stamp, query_list)])
+                    plot_data = JsonBuilder.plot_dictionary_builder(query_list, time_stamp, keep_date_striing=True)
+                    return jsonify({'plot_data': plot_data,
+                                    "y_label": y_label_text,
+                                    "x_label": X_label_text,
+                                    "success": True}), 200
+                    pass
+            elif not isinstance(query, list):
+                if query.count() > 1 and not(isinstance(date, list) or isinstance(date, tuple)) and isinstance(time_stamp,list):
+                    # get_Data_Date_24Hr(date, sensor_id)
+                    # get_Data_Month_24Hr(date, sensor_id) to b implemented
+                    print 'in 2nd if'
+                    if Xlabel == JsonBuilder.MONTH:
+                        X_label_text += JsonBuilder.extract_month_from_date(date)
+                    else:
+                        X_label_text += date.strftime("%Y-%m-%d")
+                    # return ([{'X': itemX , 'Y' : JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(time_stamp, query.all())])
+                    plot_data = JsonBuilder.plot_dictionary_builder(query.all(), time_stamp, keep_date_striing=True)
+                    # X = list()
+                    # Y =list()
+                    # for data in plot_data:
+                    #     X.append(data['X'])
+                    #     Y.append(data['Y'])
+                    # print X
+                    # print Y
+                    return jsonify({'plot_data': plot_data,
+                                    "y_label": y_label_text,
+                                    "x_label": X_label_text,
+                                    "success": True}) ,200
+                    pass
+                elif query.count() == 1 and not(isinstance(date, list) or isinstance(date, tuple)) and time_stamp is None:
+                    # get_Data_Date_Single_Point(date, sensor_id)
+                    # get_Data_Month_Single_Point
+                    print 'in 3rd if'
+                    data_list = list()
                     date_list = list()
-                    for dt in date:
-                        date_list.append(JsonBuilder.extract_month_from_date(dt))
-                    plot_data = JsonBuilder.plot_dictionary_builder(query_list, date_list, keep_date_striing=True)
-                    return jsonify({'plot_data': plot_data,
-                                    "y_label": y_label_text,
-                                    "x_label": X_label_text,
-                                    "success": True}), 200
-                else:
-                    plot_data = JsonBuilder.plot_dictionary_builder(query_list, date)
-                    return jsonify({'plot_data': plot_data,
-                                    "y_label": y_label_text,
-                                    "x_label": X_label_text,
-                                    "success": True}), 200
-                pass
-            elif query.count() > 1 and not(isinstance(date, list) or isinstance(date, tuple)) and isinstance(time_stamp,list):
-                # get_Data_Date_24Hr(date, sensor_id)
-                # get_Data_Month_24Hr(date, sensor_id) to b implemented
-                print 'in 2nd if'
-                if Xlabel == JsonBuilder.MONTH:
-                    X_label_text += JsonBuilder.extract_month_from_date(date)
-                else:
-                    X_label_text += date.strftime("%Y-%m-%d")
-                # return ([{'X': itemX , 'Y' : JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(time_stamp, query.all())])
-                plot_data = JsonBuilder.plot_dictionary_builder(query.all(), time_stamp, keep_date_striing=True)
-                # X = list()
-                # Y =list()
-                # for data in plot_data:
-                #     X.append(data['X'])
-                #     Y.append(data['Y'])
-                # print X
-                # print Y
-                return jsonify({'plot_data': plot_data,
-                                "y_label": y_label_text,
-                                "x_label": X_label_text,
-                                "success": True}) ,200
-                pass
-            elif query.count() == 1 and not(isinstance(date, list) or isinstance(date, tuple)) and time_stamp is None:
-                # get_Data_Date_Single_Point(date, sensor_id)
-                # get_Data_Month_Single_Point
-                print 'in 3rd if'
-                data_list = list()
-                date_list = list()
-                (data_list.append(query.first()))
+                    (data_list.append(query.first()))
 
-                if Xlabel == JsonBuilder.MONTH:
-                    X_label_text += JsonBuilder.extract_month_from_date(date)
-                else:
-                    X_label_text += date.strftime("%Y-%m-%d")
+                    if Xlabel == JsonBuilder.MONTH:
+                        X_label_text += JsonBuilder.extract_month_from_date(date)
+                    else:
+                        X_label_text += date.strftime("%Y-%m-%d")
 
-                if Xlabel == JsonBuilder.MONTH:
-                    date_list.append(JsonBuilder.extract_month_from_date(date))
+                    if Xlabel == JsonBuilder.MONTH:
+                        date_list.append(JsonBuilder.extract_month_from_date(date))
+                        plot_data = JsonBuilder.plot_dictionary_builder(data_list, date_list, keep_date_striing=True)
+                        return jsonify({'plot_data': plot_data,
+                                        "y_label": y_label_text,
+                                        "x_label": X_label_text,
+                                        "success": True}), 200
+                    else:
+                        date_list.append(date)
+                        # return ([{'X': JsonBuilder.serialize_date(itemX), 'Y': JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(date_list, data_list) if (itemY.ch_max and itemY.ch_min and itemY.ch_avg)])
+                        plot_data = JsonBuilder.plot_dictionary_builder(data_list, date_list)
+                        return jsonify({'plot_data': plot_data,
+                                        "y_label": y_label_text,
+                                        "x_label": X_label_text,
+                                        "success": True}), 200
+                    pass
+                elif query.count() == 1 and isinstance(date, tuple) and time_stamp is None:
+                    #get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id)
+                    # get_Data_Month_Range_Single_Point
+                    print 'in 5th if'
+                    data_list = list()
+                    date_list = list()
+                    (data_list.append(query.first()))
+                    date_from_to = 'From '
+                    if Xlabel == JsonBuilder.MONTH:
+                        count = 1
+                        for item in date:
+                            date_from_to += JsonBuilder.extract_month_from_date(item)
+                            if count < date.__len__():
+                                date_from_to += ' to ' #append to between two dates
+                            count += 1
+                        date_list.append(date_from_to)
+                    else:
+                        count = 1
+                        for item in date:
+                            date_from_to += item.strftime("%Y-%m-%d")
+                            if count < date.__len__():
+                                date_from_to += ' to ' #append to between two dates
+                            count += 1
+                        date_list.append(date_from_to)
+
                     plot_data = JsonBuilder.plot_dictionary_builder(data_list, date_list, keep_date_striing=True)
+
                     return jsonify({'plot_data': plot_data,
                                     "y_label": y_label_text,
                                     "x_label": X_label_text,
-                                    "success": True}), 200
+                                    "success": True}) ,200
+
                 else:
-                    date_list.append(date)
-                    # return ([{'X': JsonBuilder.serialize_date(itemX), 'Y': JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(date_list, data_list) if (itemY.ch_max and itemY.ch_min and itemY.ch_avg)])
-                    plot_data = JsonBuilder.plot_dictionary_builder(data_list, date_list)
-                    return jsonify({'plot_data': plot_data,
-                                    "y_label": y_label_text,
-                                    "x_label": X_label_text,
-                                    "success": True}), 200
-                pass
-            elif isinstance(query, list) and isinstance(date, tuple) and isinstance(time_stamp, list):
-                # get_Data_Date_Range_24Hr(startDate, endDate, sensor_id)
-                # get_Data_Month_Range_24Hr(startDate, endDate, sensor_id) to b implemented
-                print 'in 4th if'
-                query_list = list()
-
-                date_from_to = 'From '
-                if Xlabel == JsonBuilder.MONTH:
-                    count = 1
-                    for item in date:
-                        date_from_to += JsonBuilder.extract_month_from_date(item)
-                        if count < date.__len__():
-                            date_from_to += ' to ' #append to between two dates
-                        count += 1
-                    X_label_text += date_from_to
-                else:
-                    count = 1
-                    for item in date:
-                        date_from_to += item.strftime("%Y-%m-%d")
-                        if count < date.__len__():
-                            date_from_to += ' to ' #append to between two dates
-                        count += 1
-                    X_label_text += date_from_to
-
-                for q in query:
-                    query_list.append(q.first())
-
-                # return ([{'X': itemX , 'Y' : JsonBuilder.serialize_data(itemY)} for itemX, itemY in zip(time_stamp, query_list)])
-                plot_data = JsonBuilder.plot_dictionary_builder(query_list, time_stamp, keep_date_striing=True)
-                return jsonify({'plot_data': plot_data,
-                                "y_label": y_label_text,
-                                "x_label": X_label_text,
-                                "success": True}), 200
-            elif query.count() == 1 and isinstance(date, tuple) and time_stamp is None:
-                #get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id)
-                # get_Data_Month_Range_Single_Point
-                print 'in 5th if'
-                data_list = list()
-                date_list = list()
-                (data_list.append(query.first()))
-                date_from_to = 'From '
-                if Xlabel == JsonBuilder.MONTH:
-                    count = 1
-                    for item in date:
-                        date_from_to += JsonBuilder.extract_month_from_date(item)
-                        if count < date.__len__():
-                            date_from_to += ' to ' #append to between two dates
-                        count += 1
-                    date_list.append(date_from_to)
-                else:
-                    count = 1
-                    for item in date:
-                        date_from_to += item.strftime("%Y-%m-%d")
-                        if count < date.__len__():
-                            date_from_to += ' to ' #append to between two dates
-                        count += 1
-                    date_list.append(date_from_to)
-
-                plot_data = JsonBuilder.plot_dictionary_builder(data_list, date_list, keep_date_striing=True)
-
-                return jsonify({'plot_data': plot_data,
-                                "y_label": y_label_text,
-                                "x_label": X_label_text,
-                                "success": True}) ,200
-
+                    print 'WTF??'
+                    return jsonify({'error': 'No Query result from database'}), 404
+                    pass
             else:
-                print 'WTF??'
-                return jsonify({'error': 'No Query result from database'}), 404
-                pass
+                return jsonify({'error': 'query is an unexpected object'}), 404
         else:
             return jsonify({'error': 'Sensor not found in database'}), 404 #sensor is string and 404 is not found
 
@@ -298,13 +302,13 @@ class JsonBuilder(object):
             return {
                 "ch_max": float("{0:.2f}".format(data_obj.ch_max)),
                 "ch_min": float("{0:.2f}".format(data_obj.ch_min)),
-                "ch_Avg": float("{0:.2f}".format(data_obj.ch_avg))
+                "ch_avg": float("{0:.2f}".format(data_obj.ch_avg))
             }
         else:  # for None
             return {
                 "ch_max": (data_obj.ch_max),
                 "ch_min": (data_obj.ch_min),
-                "ch_Avg": (data_obj.ch_avg)
+                "ch_avg": (data_obj.ch_avg)
             }
 
     @staticmethod

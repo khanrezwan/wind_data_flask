@@ -1,4 +1,3 @@
-
 <h3>Raw Data Plotter UI</h3>
 <!-- Angular JS App begin-->
 <div ng-app="myApp" ng-controller="myCtrl"><!-- Angular JS DIV Start -->
@@ -6,8 +5,6 @@
     <div class="alert alert-dismissable alert-success" id="Alert_Flash_dynamic">
         {{ '{{' }} msg {{ '}}' }}
     </div>
-     <a class="btn btn-lg btn-primary" ng-click="send_query()"><i class="glyphicon glyphicon-eye-open"></i> query test</a>
-<br>
     <div class="row-fluid">
         <div class="col-md-5">
             <!-- Step 1 start -->
@@ -64,38 +61,39 @@
                 </div>
                 <div class="panel-body">
 
-                        <!-- step 3-a start -->
-                        <div class="row">
+                    <!-- step 3-a start -->
+                    <div class="row">
                         <div class="col-md-12 text-center" id="date_or_month">
 
                             <div class="panel-heading">
                                 <h3 class="panel-title">Step 3a:</h3>
                             </div>
                             <div class="btn-group">
-                                <label class="btn btn-success" ng-model="value"
-                                       btn-radio="'by_date'"  ng-change="option_month_or_date(value)">By Date</label>
-                                <label class="btn btn-success" ng-model="value"
-                                       btn-radio="'by_month'"  ng-change="option_month_or_date(value)">By Month</label>
+                                <label class="btn btn-success" ng-model="value_3a"
+                                       btn-radio="'by_date'" ng-change="option_month_or_date(value_3a)">By Date</label>
+                                <label class="btn btn-success" ng-model="value_3a"
+                                       btn-radio="'by_month'" ng-change="option_month_or_date(value_3a)">By Month</label>
                             </div>
-                           <!-- <form class="form-group">
-                                <div class="radio">
-                                    <label>
-                                        <input type="radio" ng-model="value" name="optradio" value="by_date"
-                                               ng-change="option_month_or_date(value)">By Date</label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <input type="radio" ng-model="value" name="optradio" value="by_month"
-                                               ng-change="option_month_or_date(value)">By Month</label>
-                                </div>
-                                <div class="radio disabled">
-                                    <label>
-                                        <input type="radio" name="optradio" disabled="">By Year</label>
-                                </div>
-                            </form> -->
-                        </div></div>
-                        <!-- step 3-a end -->
-                        <div class="row">
+                            <!-- <form class="form-group">
+                                 <div class="radio">
+                                     <label>
+                                         <input type="radio" ng-model="value" name="optradio" value="by_date"
+                                                ng-change="option_month_or_date(value)">By Date</label>
+                                 </div>
+                                 <div class="radio">
+                                     <label>
+                                         <input type="radio" ng-model="value" name="optradio" value="by_month"
+                                                ng-change="option_month_or_date(value)">By Month</label>
+                                 </div>
+                                 <div class="radio disabled">
+                                     <label>
+                                         <input type="radio" name="optradio" disabled="">By Year</label>
+                                 </div>
+                             </form> -->
+                        </div>
+                    </div>
+                    <!-- step 3-a end -->
+                    <div class="row">
                         <div class="col-md-12 text-center" id="time">
                             <!-- step 3-b for date start -->
                             <div ng-show="by_date">
@@ -103,11 +101,13 @@
                                     <h3 class="panel-title">Step 3b:</h3>
                                 </div>
                                 <div class="btn-group">
-                                <label class="btn btn-success" ng-model="value"
-                                       btn-radio="'single'"  ng-change="option_single_or_range(value)">Single Date</label>
-                                <label class="btn btn-success" ng-model="value"
-                                       btn-radio="'range'"  ng-change="option_single_or_range(value)">For a range of dates</label>
-                            </div>
+                                    <label class="btn btn-success" ng-model="value"
+                                           btn-radio="'single'" ng-change="option_single_or_range(value)">Single
+                                        Date</label>
+                                    <label class="btn btn-success" ng-model="value"
+                                           btn-radio="'range'" ng-change="option_single_or_range(value)">For a range of
+                                        dates</label>
+                                </div>
                                 <!--<form class="form-group">
                                     <div class="radio">
                                         <label>
@@ -129,25 +129,27 @@
                                     <h3 class="panel-title">Step 3b:</h3>
                                 </div>
                                 <div class="btn-group">
-                                <label class="btn btn-success" ng-model="value"
-                                       btn-radio="'single'"  ng-change="option_single_or_range(value)">Single Month</label>
-                                <label class="btn btn-success" ng-model="value"
-                                       btn-radio="'range'"  ng-change="option_single_or_range(value)">For a range of Months</label>
-                            </div>
-{#                                <form class="form-group">#}
-{#                                    <div class="radio">#}
-{#                                        <label>#}
-{#                                            <input type="radio" name="optradio" ng-model="enable_start_date"#}
-{#                                                   value="single" ng-click="option_single_or_range(enable_start_date)">Single#}
-{#                                            Month</label>#}
-{#                                    </div>#}
-{#                                    <div class="radio">#}
-{#                                        <label>#}
-{#                                            <input type="radio" name="optradio" ng-model="enable_end_date" value="range"#}
-{#                                                   ng-click="option_single_or_range(enable_end_date)">For a range of#}
-{#                                            months</label>#}
-{#                                    </div>#}
-{#                                </form>#}
+                                    <label class="btn btn-success" ng-model="value"
+                                           btn-radio="'single'" ng-change="option_single_or_range(value)">Single
+                                        Month</label>
+                                    <label class="btn btn-success" ng-model="value"
+                                           btn-radio="'range'" ng-change="option_single_or_range(value)">For a range of
+                                        Months</label>
+                                </div>
+                                {#                                <form class="form-group">#}
+                                {#                                    <div class="radio">#}
+                                {#                                        <label>#}
+                                {#                                            <input type="radio" name="optradio" ng-model="enable_start_date"#}
+                                {#                                                   value="single" ng-click="option_single_or_range(enable_start_date)">Single#}
+                                {#                                            Month</label>#}
+                                {#                                    </div>#}
+                                {#                                    <div class="radio">#}
+                                {#                                        <label>#}
+                                {#                                            <input type="radio" name="optradio" ng-model="enable_end_date" value="range"#}
+                                {#                                                   ng-click="option_single_or_range(enable_end_date)">For a range of#}
+                                {#                                            months</label>#}
+                                {#                                    </div>#}
+                                {#                                </form>#}
                             </div>
                             <!-- step 3-b for month end -->
                         </div>
@@ -280,7 +282,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 text-center">
-                                    <alert ng-repeat="alert in alerts"  type="{{  '{{'}}alert.type{{'}}'}}" close="closeAlert($index)">{{  '{{'}}alert.msg{{'}}'}}</alert>
+                                    <alert ng-repeat="alert in alerts" type="{{ '{{' }}alert.type{{ '}}' }}"
+                                           close="closeAlert($index)">{{ '{{' }}alert.msg{{ '}}' }}</alert>
                                     <a class="btn btn-lg btn-primary " ng-click="validate_date()"> Next </a></div>
                             </div>
                         </div>
@@ -298,13 +301,16 @@
                         <div class="col-md-12 text-center">
                             <div class="btn-group">
                                 <label class="btn btn-success" ng-model="value_step_5"
-                                       btn-radio="'singlevalue'">Single value</label>
+                                       btn-radio="'singlevalue'" ng-change="option_plot_type(value_step_5)">Single
+                                    value</label>
                                 <label class="btn btn-success" ng-model="value_step_5"
-                                       btn-radio="'individual'">Individual</label>
+                                       btn-radio="'individual'"
+                                       ng-change="option_plot_type(value_step_5)">Individual</label>
                                 <label class="btn btn-success" ng-model="value_step_5"
-                                       btn-radio="'timestamp'">Time Stamp</label>
+                                       btn-radio="'timestamp'" ng-change="option_plot_type(value_step_5)">Time
+                                    Stamp</label>
                             </div>
-                            <br>{{ '{{' }}value_step_5{{ '}}' }}
+                            {#                            <br>{{ '{{' }}value_step_5{{ '}}' }}#}
                             <!-- <div class="radio">
                                  <label>
                                      <input type="radio" name="optradio">Single value</label>
@@ -323,7 +329,8 @@
             </div>
             <!-- Step 5 end -->
             <div class="text-center" ng-show="show_button">
-                <a class="btn btn-lg btn-primary" ng-click="send_query()"><i class="glyphicon glyphicon-eye-open"></i> View Plot</a>
+                <a class="btn btn-lg btn-primary" ng-click="send_query()"><i class="glyphicon glyphicon-eye-open"></i>
+                    View Plot</a>
             </div>
 
         </div>
@@ -340,6 +347,9 @@
                             </div>
                             <div class="panel-body">
                                 <p contenteditable="true">Angular-chart goes here</p>
+                                <!-- AngularJS Charts Start-->
+                                <canvas id="bar" class="chart chart-bar" data="data" labels="labels"></canvas>
+                                <!-- AngularJS Charts End-->
                             </div>
                         </div>
                     </div>
@@ -352,6 +362,7 @@
 
 
 <script type="text/javascript" src="
+
 
 
 
