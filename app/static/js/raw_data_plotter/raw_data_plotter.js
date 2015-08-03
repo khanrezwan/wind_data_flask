@@ -3,7 +3,7 @@
  * http://angular-ui.github.io/bootstrap/
  */
 
-/* ToDo ng-app will send query to ngQueries with following params
+/*
  sensor_id = int. must be sent
  start_date = json date, use in case of single date or month case, must be sent
  end_date = json date, optional, for range cases
@@ -183,10 +183,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             temp_Y.push(parseFloat(data.plot_data[i].Y.ch_avg));
         }
 
-        for (var i = 0; i<temp_X.length;i++)
-        {
-             display = display + " X = "+ temp_X[i] +" Y = "+ temp_Y[i];
-        }
+
         //$scope.msg = display;
         //{
         //   temp_X.push(data.plot_data[i].X);
@@ -199,6 +196,13 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
         $scope.data = new Array(1);
         $scope.data[0] = new Array(temp_Y.length);
+        //$scope.data[0].push(temp_Y);
+        $scope.legend = true;
+        //$scope.options ={
+        //    'scaleShowLabels': 'false',
+        //    'tooltipFontSize': '20'
+        //
+        //};
         for(var j = 0; j<temp_Y.length;j++)
         {
             $scope.data[0][j] = temp_Y[j];
@@ -334,6 +338,8 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_plot = false;
         $scope.show_start_date_calendar = false;
         $scope.show_end_date_calendar = false;
+        $scope.end_date_ui = null;
+        $scope.start_date_ui = null;
         //  $scope.enable_start_date = false;
         //$scope.enable_end_date = false;
         //after step 3b
@@ -400,7 +406,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_step_5 = false;
         $scope.show_button = false;
         $scope.show_plot = false;
-        // Todo make all step 5 radio value false
+
     };
     $scope.update_start_date = function (start_date_ui) {
         var temp_date = new Date(start_date_ui);
@@ -412,7 +418,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_step_5 = false;
         $scope.show_button = false;
         $scope.show_plot = false;
-        // Todo make all step 5 radio value false
+
     };
 
     $scope.closeAlert = function (index) {
@@ -426,7 +432,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_button = false;
         $scope.show_plot = false;
 
-        //Todo after some validation
+
         if ($scope.show_end_date_calendar && $scope.start_date && $scope.end_date) {
             if ($scope.end_date >= $scope.start_date) {
                 $scope.show_step_5 = true;

@@ -62,7 +62,7 @@ class Rawdata_plotter_helper(object):
                                                 db.func.avg(RawData.ch_avg).label('ch_avg')).\
                 filter(RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
                        RawData.fk_sensor_id == sensor_id)
-            print query.count()
+            # print query.count()
             # return query
             return Rawdata_plotter_helper.dictionary_builder(query, date=date, sensor_id=sensor_id)
         else:
@@ -100,14 +100,14 @@ class Rawdata_plotter_helper(object):
                     time_stamp_list.append(item.time_stamp)
 
                 # test code start
-                for item in query_distinct_time_stamps.all():
-                    print item.time_stamp
-                for res in query_list:
-                    print 'count ', res.count()
-                    print 'time', res.first().time_stamp
-                    print 'ch_max ', res.first().ch_max
-                    print 'ch_min ', res.first().ch_min
-                    print 'ch_avg ', res.first().ch_avg
+                # for item in query_distinct_time_stamps.all():
+                #     print item.time_stamp
+                # for res in query_list:
+                #     print 'count ', res.count()
+                #     print 'time', res.first().time_stamp
+                #     print 'ch_max ', res.first().ch_max
+                #     print 'ch_min ', res.first().ch_min
+                #     print 'ch_avg ', res.first().ch_avg
 
                 # test code end
                 # return query_list
@@ -136,13 +136,13 @@ class Rawdata_plotter_helper(object):
                     RawData.yearmonthdate_stamp >= start_date_param,
                     RawData.yearmonthdate_stamp <= end_date_param,
                     RawData.fk_sensor_id == sensor_id)
-               #test code start
-                print 'count ', query.count()
-                print 'ch_max ', query.first().ch_max
-                print 'ch_min ', query.first().ch_min
-                print 'ch_avg ', query.first().ch_avg
-                #test code end
-                # return query
+               # #test code start
+               #  print 'count ', query.count()
+               #  print 'ch_max ', query.first().ch_max
+               #  print 'ch_min ', query.first().ch_min
+               #  print 'ch_avg ', query.first().ch_avg
+               #  #test code end
+               #  # return query
                 return Rawdata_plotter_helper.dictionary_builder(query, date=(startDate, endDate), sensor_id=sensor_id)
             else:
                 raise ValueError('End date must be greater than or equal to start date')
@@ -165,13 +165,13 @@ class Rawdata_plotter_helper(object):
                     query = res['query']
                     query_list.append(query)
                     date_list.append(dt)
-               #test code start
-                    print 'count ', query.count()
-                    print 'ch_max ', query.first().ch_max
-                    print 'ch_min ', query.first().ch_min
-                    print 'ch_avg ', query.first().ch_avg
-                #test code end
-                # return query_list, date_list
+               # #test code start
+               #      print 'count ', query.count()
+               #      print 'ch_max ', query.first().ch_max
+               #      print 'ch_min ', query.first().ch_min
+               #      print 'ch_avg ', query.first().ch_avg
+               #  #test code end
+               #  # return query_list, date_list
                 return Rawdata_plotter_helper.dictionary_builder(query_list, date=date_list, sensor_id=sensor_id)
             else:
                 raise ValueError('End date must be greater than or equal to start date')
@@ -190,16 +190,16 @@ class Rawdata_plotter_helper(object):
             (weekday_of_first_day_month, end_date_month) = calendar.monthrange(date.year, date.month)
 
             start_date = datetime.datetime(date.year, date.month, 1)
-            print type(start_date)
+            # print type(start_date)
             end_date = datetime.datetime(date.year, date.month, end_date_month)
             res = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(start_date, end_date, sensor_id)
             query = res['query']
-           #test code start
-            print 'count ', query.count()
-            print 'ch_max ', query.first().ch_max
-            print 'ch_min ', query.first().ch_min
-            print 'ch_avg ', query.first().ch_avg
-            #test code end
+           # #test code start
+           #  print 'count ', query.count()
+           #  print 'ch_max ', query.first().ch_max
+           #  print 'ch_min ', query.first().ch_min
+           #  print 'ch_avg ', query.first().ch_avg
+           #  #test code end
             return Rawdata_plotter_helper.dictionary_builder(query, date=date, sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
@@ -218,13 +218,13 @@ class Rawdata_plotter_helper(object):
                 endDate = datetime.datetime(endDate.year, endDate.month, end_date_of_month)
                 res = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id)
                 query = res['query']
-                #test code start
-                print 'count ', query.count()
-                print 'ch_max ', query.first().ch_max
-                print 'ch_min ', query.first().ch_min
-                print 'ch_avg ', query.first().ch_avg
-                #test code end
-                # return query
+                # #test code start
+                # print 'count ', query.count()
+                # print 'ch_max ', query.first().ch_max
+                # print 'ch_min ', query.first().ch_min
+                # print 'ch_avg ', query.first().ch_avg
+                # #test code end
+                # # return query
                 return Rawdata_plotter_helper.dictionary_builder(query, date=(startDate, endDate), sensor_id=sensor_id)
             else:
                 raise ValueError('End date must be greater than or equal to start date')
@@ -264,7 +264,7 @@ class Rawdata_plotter_helper(object):
 
         pass
 
-    # Todo-Rezwan Add Monthly 24 Hr view and Monthly 24 Hr view for a range
+
 
     @staticmethod
     def get_Data_Month_24Hr(date, sensor_id):
@@ -297,12 +297,12 @@ class Rawdata_plotter_helper(object):
     def get_Data_Month_Range_Single_Point_for_each_Day(startDate, endDate, sensor_id):
 
         # Todo call where startdate is 1st day stardate month and end date is last day of endday monthRawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date()
-
+        # ToDo do we need this?
         pass
 
     @staticmethod
     def get_Data_Month_Single_Point_for_each_Day(date, sensor_id):
-        # Todo call where date is 1st day stardate month and end date is last day of date month Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date()
+
         if isinstance(date, datetime.datetime):
             try:
                 sensor_id = int(sensor_id)

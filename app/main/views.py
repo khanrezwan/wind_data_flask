@@ -23,7 +23,7 @@ def index():
     name = None
     pageparams = base_page_dictionary_builder(navbar_view_specific_left_col_buttons=[['dynamic_1'], ['dynamic_2']],
                                               brand_name='FLAKE')
-    # Todo-Anas Try the following
+
     # pageparams = base_page_dictionary_builder()
     form = NameForm()
     if form.validate_on_submit():

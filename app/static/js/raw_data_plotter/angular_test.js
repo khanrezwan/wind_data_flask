@@ -3,7 +3,7 @@
  * http://angular-ui.github.io/bootstrap/
  */
 
-    /* ToDo ng-app will send query to ngQueries with following params
+    /*  ng-app will send query to ngQueries with following params
     sensor_id = int. must be sent
     start_date = json date, use in case of single date or month case, must be sent
     end_date = json date, optional, for range cases

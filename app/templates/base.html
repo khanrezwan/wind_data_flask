@@ -26,9 +26,7 @@
                           rel="stylesheet" type="text/css">
                     <link href="{{ url_for('static', filename='css/lib/bootstrap.min.css') }}"
                           rel="stylesheet" type="text/css">
-                    <!-- Date time Picker Library -->
-{#                    <link href="{{ url_for('static', filename='css/lib/bootstrap-datetimepicker.css') }}"#}
-{#                          rel="stylesheet" type="text/css">#}
+
                 {%- endblock styles %}
             {%- endblock head %}
         </head>
@@ -92,7 +90,7 @@
             </div>
             <div class="section">
             <div class="container-fluid">
-                <div class="row">
+                <div class="row-fluid">
                     <div class="col-md-12">
                         {% block flash_msg_top %}
                             {% with messages = get_flashed_messages() %}
@@ -114,11 +112,13 @@
                         {%- endblock flash_msg_top %}
                     </div>
                 </div>
+            <div class="row content-row">
                 {% block view_specific_left_col_buttons %}
 
                     {% if navbar_view_specific_left_col_buttons |count != 0 %}
-                <div class="row content-row">
-                    <div class="col-md-3">
+
+
+                        <div class="col-md-3">
                         <ul class="nav nav-pills nav-stacked">
 
                                 {% for view_specific_left_col_button in navbar_view_specific_left_col_buttons %}
@@ -129,11 +129,16 @@
                     </div>
                     {% endif %}
                 {%- endblock view_specific_left_col_buttons %}
-                    <div class="col-md-offset-0"> <!-- original value "col-md-9"" -->
+                <div class="container-fluid">
+                {% if navbar_view_specific_left_col_buttons |count != 0 %}
+                <div class="col-md-9">
+                    {% else %}
+                    <div class="col-md-12">
+                {% endif %}
+                 <!-- original value "col-md-9"" -->
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-12">
-
 
                                     {% block content_1 %}
                                     {%- endblock content_1 %}
@@ -146,6 +151,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
                 </div>
             </div>
