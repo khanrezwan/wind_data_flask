@@ -22,12 +22,12 @@ var app = angular.module('myApp', ['ui.bootstrap', "chart.js"]);
 app.controller('myCtrl', function ($scope, $http, $window) {
 
 
-    $scope.labels = ['0:00','0:10','0:20'];
-    $scope.series = ['Series A'];
+    $scope.labels = [''];
+    $scope.series = [''];
 
 
     $scope.data = [
-        [1.2,1.3,1.4]
+        []
     ]; //list of list
 
     //$scope.labels = ['0:00','0:10','0:20'];//X
@@ -173,9 +173,12 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         var temp_X = [];
         var temp_Y = [];
         var display = '';
+        $scope.labels=[];
+        $scope.data = [];
+        $scope.series=[];
         for (var i=0;i<data.plot_data.length;i++)
         {
-            display = display + " "+ data.plot_data[i].Y.ch_avg;
+            //display = display + " "+ data.plot_data[i].Y.ch_avg;
             temp_X.push(data.plot_data[i].X);
             temp_Y.push(parseFloat(data.plot_data[i].Y.ch_avg));
         }
@@ -184,7 +187,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         {
              display = display + " X = "+ temp_X[i] +" Y = "+ temp_Y[i];
         }
-        $scope.msg = display;
+        //$scope.msg = display;
         //{
         //   temp_X.push(data.plot_data[i].X);
         //    //console.log(item.X);
@@ -192,14 +195,29 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         //    count = count+1;
         //    //$scope.data.push(item.Y.ch_avg);
         //}
-        //$scope.labels = (temp_X);
-        //$scope.data = (temp_Y);
-        //$scope.series.push(data.y_label);
+        $scope.labels.push.apply($scope.labels,temp_X);
+
+        $scope.data = new Array(1);
+        $scope.data[0] = new Array(temp_Y.length);
+        for(var j = 0; j<temp_Y.length;j++)
+        {
+            $scope.data[0][j] = temp_Y[j];
+        }
+
+        $scope.series.push(data.y_label);
         //display ='';
         //for (var i = 0; i<labels.length;i++)
         //{
         //     display = display + " label = "+ $scope.labels[i] +" data = "+ $scope.data[i];
         //}
+    //     $scope.labels = ['0:00','0:10','0:20'];
+    //$scope.series = ['Series A','Series B'];
+    //
+    //
+    //$scope.data = [
+    //    [1.2,1.3,1.4],
+    //    [1.2,10.3,2.4]
+    //];
         $scope.show_plot = true;
     };
     $scope.init_logger = function () {
