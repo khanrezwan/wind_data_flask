@@ -12,6 +12,7 @@ from .. import db
 from ..models import *
 from ..decorators import requires_roles
 
+
 # from ..wind_data_parser import Parser
 
 
@@ -49,7 +50,6 @@ from ..decorators import requires_roles
 ################
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-
     # restrict view to already logged in users
     if 'logged_in' in session:
         return redirect('/')
@@ -71,7 +71,6 @@ def login():
 ##########
 @auth.route('/logout')
 @login_required
-
 def logout():
     # logout user and destroy session
     logout_user()
@@ -88,7 +87,6 @@ def logout():
 # Register #
 ##########
 @auth.route('/register', methods=['GET', 'POST'])
-
 def registeruser():
     if 'logged_in' in session:
         flash('You are already logged in. <a href=\"%s\">Logout?</a>' % url_for('auth.logout'))

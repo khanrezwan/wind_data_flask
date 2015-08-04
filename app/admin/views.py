@@ -1,7 +1,7 @@
 __author__ = 'rezwan'
 # Library imports
 from flask_admin import BaseView, expose
-from flask.ext.login import current_user, login_required
+from flask.ext.login import current_user
 from flask import redirect, url_for, request, abort
 from flask_admin.contrib.sqla import ModelView
 
@@ -12,7 +12,6 @@ from app import db
 
 
 class MyView(BaseView):
-
     @expose('/')
     def index(self):
         # if not login.current_user.is_authenticated():
@@ -33,47 +32,41 @@ class MyView(BaseView):
 
 
 class UserView(ModelView):
-
-
-# Override displayed fields
+    # Override displayed fields
     column_list = ('username', 'email', 'role')
 
     def __init__(self, session, **kwargs):
-# You can pass name and other parameters if you want to
+        # You can pass name and other parameters if you want to
         super(UserView, self).__init__(User, session, **kwargs)
 
     def is_accessible(self):
-        #print current_user.is_admin()
+        # print current_user.is_admin()
         # print current_user.is_authenticated()
         return current_user.is_admin()
 
     def _handle_view(self, name, **kwargs):
         # print 'outside'
         if not self.is_accessible():
-
             abort(403)
 
 
 class RoleView(ModelView):
-
     def __init__(self, session, **kwargs):
-    # You can pass name and other parameters if you want to
+        # You can pass name and other parameters if you want to
         super(RoleView, self).__init__(Role, session, **kwargs)
 
     def is_accessible(self):
-        #print current_user.is_admin()
+        # print current_user.is_admin()
         # print current_user.is_authenticated()
         return current_user.is_admin()
 
     def _handle_view(self, name, **kwargs):
         # print 'outside'
         if not self.is_accessible():
-
             abort(403)
 
 
 class LoggerView(ModelView):
-
     def __init__(self, session, **kwargs):
         # You can pass name and other parameters if you want to
         super(LoggerView, self).__init__(Logger, session, **kwargs)
@@ -84,7 +77,6 @@ class LoggerView(ModelView):
     def _handle_view(self, name, **kwargs):
         # print 'outside'
         if not self.is_accessible():
-
             abort(403)
 
 
@@ -97,69 +89,62 @@ class FileView(ModelView):
         super(FileView, self).__init__(File, session, **kwargs)
 
     def is_accessible(self):
-        #print current_user.is_admin()
+        # print current_user.is_admin()
         # print current_user.is_authenticated()
         return current_user.is_admin()
 
     def _handle_view(self, name, **kwargs):
-
         if not self.is_accessible():
-
             abort(403)
 
 
 class SensorView(ModelView):
-
     def __init__(self, session, **kwargs):
-    # You can pass name and other parameters if you want to
+        # You can pass name and other parameters if you want to
         super(SensorView, self).__init__(Sensor, session, **kwargs)
 
     def is_accessible(self):
-        #print current_user.is_admin()
+        # print current_user.is_admin()
         # print current_user.is_authenticated()
         return current_user.is_admin()
 
     def _handle_view(self, name, **kwargs):
         # print 'outside'
         if not self.is_accessible():
-
             abort(403)
 
 
 class SiteView(ModelView):
-
     def __init__(self, session, **kwargs):
-    # You can pass name and other parameters if you want to
+        # You can pass name and other parameters if you want to
         super(SiteView, self).__init__(Site, session, **kwargs)
 
     def is_accessible(self):
-        #print current_user.is_admin()
+        # print current_user.is_admin()
         # print current_user.is_authenticated()
         return current_user.is_admin()
 
     def _handle_view(self, name, **kwargs):
         # print 'outside'
         if not self.is_accessible():
-
             abort(403)
 
 
 class RawDataView(ModelView):
-
     def __init__(self, session, **kwargs):
-    # You can pass name and other parameters if you want to
+        # You can pass name and other parameters if you want to
         super(RawDataView, self).__init__(RawData, session, **kwargs)
 
     def is_accessible(self):
-        #print current_user.is_admin()
+        # print current_user.is_admin()
         # print current_user.is_authenticated()
         return current_user.is_admin()
 
     def _handle_view(self, name, **kwargs):
         # print 'outside'
         if not self.is_accessible():
-
             abort(403)
+
 
 admin.add_view(UserView(db.session))
 admin.add_view(RoleView(db.session))

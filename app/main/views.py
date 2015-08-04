@@ -1,7 +1,7 @@
 # Library Imports
 from datetime import datetime
 from flask import render_template, session, redirect, url_for, request, flash, g
-# from flask.ext.login import LoginManager, login_user, logout_user, login_required
+from flask.ext.login import login_required
 # from werkzeug import check_password_hash, generate_password_hash
 from flask import current_app as app
 from werkzeug import secure_filename
@@ -14,30 +14,19 @@ from .forms import *
 from .. import db
 from ..models import *
 from ..wind_data_parser import Parser
-from ..decorators import base_page_dictionary_builder
+from ..decorators import base_page_dictionary_builder, requires_roles
 
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
 
-    name = None
-    pageparams = base_page_dictionary_builder(navbar_view_specific_left_col_buttons=[['dynamic_1'], ['dynamic_2']],
-                                              brand_name='FLAKE')
-
-    # pageparams = base_page_dictionary_builder()
-    form = NameForm()
-    if form.validate_on_submit():
-        name = form.name.data
-        form.name.data = ''
-    # P = Parser(rawDataDirectory='May')
-    # P.init_static_vars()
-    # P.parse()
-    # print app.config['UPLOAD_FOLDER']
-    return render_template('index.html', form=form, name=name, **pageparams)
+    return render_template('index.html')
     pass
 
 
 @main.route('/upload', methods=['GET', 'POST'])
+@login_required
+@requires_roles('admin')
 def upload():
     process = False
     # form object to pass into render template
@@ -93,6 +82,8 @@ def upload():
     return render_template('upload.html', form=form, process=process)
 
 @main.route('/process', methods=['GET', 'POST'])
+@login_required
+@requires_roles('admin')
 def call_parser():
     # response_dict = dict()
     parser = Parser(rawDataDirectory=app.config['UPLOAD_FOLDER'])

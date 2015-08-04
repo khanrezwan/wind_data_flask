@@ -3,10 +3,5 @@ from wtforms import SubmitField, PasswordField, StringField, BooleanField, Selec
 from wtforms.validators import DataRequired, Email, EqualTo, regexp
 
 
-class NameForm(Form):
-    name = StringField('What is your name?', validators=[DataRequired()])
-    submit = SubmitField('Submit')
-
-
 class UploadForm(Form):
     datafiles = StringField('Upload Files')

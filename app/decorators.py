@@ -19,6 +19,12 @@ def base_page_dictionary_builder(brand_name='', navbar_dynamic_lis=list(),
 
 
 def requires_roles(*roles):
+    """
+    http://flask.pocoo.org/snippets/98/
+    @required_roles('admin', 'user')
+    :param roles: string(s) of role name(s)
+    :return:
+    """
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):

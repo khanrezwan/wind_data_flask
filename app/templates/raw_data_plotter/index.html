@@ -1,36 +1,105 @@
+{# Copy this template code to start a view#}
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %} Chart tester {% endblock %}
-{% block brand_href %} href="/"{% endblock %}
+{% block doc %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block html_attribs %}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block html %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block title %}
+    {# Add your Codes Here   #}
+    Query Tester
+{% endblock %}
+{% block metas %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+    <!-- Scripts for Angular.JS library  -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/angular.min.js') }}"></script>
+    <!-- Scripts for Angular.JS ui date picker library  -->
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/lib/ui-bootstrap-tpls-0.13.0.min.js') }}"></script>
+    <!-- Scripts for Angular.JS Charts library  -->
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/lib/Chart.min.js') }}"></script> <!-- Must maintain the order-->
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/lib/angular-chart.min.js') }}"></script>
+
+{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+    <!-- Styless for Angular.JS Charts library  -->
+    <link href="{{ url_for('static', filename='css/lib/angular-chart.css') }}"
+          rel="stylesheet" type="text/css">
+{%- endblock %}
+
+{% block body_attribs %}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block body %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block brand_href %}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block navbar_dynamic %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block flash_msg_top %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+{% endblock %}
+
+{% block view_specific_left_col_buttons %}
+    {{ super() }}
+    {# Add your Codes Here   #}
+{% endblock %}
+
 
 {% block content_1 %}
-<div class="container">
-    <div class="col-sm-6" style="height:130px;">
-        <div class="form-group">
-            <div class='input-group date' id='datetimepicker10'>
-                <input type='text' class="form-control" />
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar">
-                    </span>
-                </span>
-            </div>
-        </div>
-    </div>
-    <script type="text/javascript">
-        $(function () {
-            $('#datetimepicker10').datetimepicker({
-                viewMode: 'years',
-                format: 'MM/YYYY'
-            });
-        });
-    </script>
-</div>
-{#<img src={{ image }}>#}
+    {# Add your Codes Here   #}
+    {% if form %}
+        {{ wtf.quick_form(form) }}
+    {% endif %}
 {% endblock %}
+
+
 {% block content_2 %}
-    {{chart|safe}}
+    {# Add your Codes Here   #}
+    {# NG-APP#}
+    {% include  'raw_data_plotter/raw_data_plotter_ui.html' %}
 {% endblock %}
+
 {% block content_footer %}
-    <p class="navbar-text">Footer</p>
+    {# Add your Codes Here   #}
 {% endblock %}
+
+
+

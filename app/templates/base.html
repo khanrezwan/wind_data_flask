@@ -45,18 +45,41 @@
                         </button>
                         <a class="navbar-brand"
                                 {% block brand_href %}{%- endblock brand_href %}><span>{% if brand_name %}
-                            {{ brand_name }}{% else %}Webapp{% endif %}</span></a>
+                            {{ brand_name }}{% else %}USDK{% endif %}</span></a>
                     </div>
                     <div class="collapse navbar-collapse" id="navbar-ex-collapse">
                         <ul class="nav navbar-left navbar-nav">
                             <li class="pull-left">
                                 <a href="/"><i class=" glyphicon glyphicon-home"></i> Home</a>
                             </li>
-                            <li class="pull-left">
-                                <a href="#">Static_1</a>
-                            </li>
+                            {% if current_user.is_authenticated() == True %}
+                                <li class="pull-left">
+                                    <a href="{{ url_for('raw_data_plotter.index') }}"><i
+                                            class=" glyphicon glyphicon-stats"></i> Wind Data Viewer</a>
+                                </li>
 
-                        {% block navbar_dynamic %}
+                            {% endif %}
+                            {% if current_user.is_admin() == True %}
+                                <li class="pull-left">
+                                    <a href="{{ url_for('main.upload') }}"><i class=" glyphicon glyphicon-upload"></i>
+                                        Upload Files</a>
+                                </li>
+                                <li class="pull-left">
+                                    <a href="{{ url_for('main.call_parser') }}"><i class=" glyphicon glyphicon-cog"></i>
+                                        Process Files</a>
+                                </li>
+                                <li class="pull-left">
+                                    <a href="{{ url_for('admin.index') }}"><i class=" glyphicon glyphicon-wrench"></i>
+                                        Admin Panel</a><!-- Todo test-->
+                                </li>
+                                <li class="pull-left">
+                                    <a href="{{ url_for('auth.registeruser') }}">Register</a>
+                                </li>
+                                <li class="pull-left">
+                                    <a href="{{ url_for('auth.addrole') }}">Add Role</a>
+                                </li>
+                            {% endif %}
+                            {% block navbar_dynamic %}
                                 {% for navbar_dynamic_li in navbar_dynamic_lis %}
                                     {{ macros.render_navbar_link(*navbar_dynamic_li) }}
                                 {% endfor %}
@@ -65,23 +88,24 @@
                         </ul>
 
                         <ul class="nav navbar-nav navbar-right" id="DynamicNav">
-                             {% if current_user.is_authenticated() == False %}
+                            {% if current_user.is_authenticated() == False %}
                                 <li class="pull-left">
-                                    <a href="{{ url_for('auth.login') }}"><i class=" glyphicon glyphicon-log-in"></i>  Log In</a>
+                                    <a href="{{ url_for('auth.login') }}"><i class=" glyphicon glyphicon-log-in"></i>
+                                        Log In</a>
                                 </li>
                                 <li class="pull-left">
                                     <a href="{{ url_for('auth.registeruser') }}">Register</a>
                                 </li>
                             {% else %}
                                 <li class="pull-left">
-                                    <a href="#"><i class=" glyphicon glyphicon-user"></i>  {{ current_user.username }}</a>
+                                    <a href="#"><i class=" glyphicon glyphicon-user"></i> {{ current_user.username }}
+                                    </a>
                                 </li>
                                 <li class="pull-left">
-                                    <a href="{{ url_for('auth.logout') }}"><i class=" glyphicon glyphicon-log-out"></i>  Log Out</a>
+                                    <a href="{{ url_for('auth.logout') }}"><i class=" glyphicon glyphicon-log-out"></i>
+                                        Log Out</a>
                                 </li>
-                                <li class="pull-left">
-                                    <a href="{{ url_for('auth.addrole') }}">Add_Role</a>
-                                </li>
+
                             {% endif %}
 
                         </ul>
@@ -90,28 +114,28 @@
             </div>
             <div class="section">
             <div class="container-fluid">
-                <div class="row-fluid">
-                    <div class="col-md-12">
-                        {% block flash_msg_top %}
-                            {% with messages = get_flashed_messages() %}
-                                {% if messages %}
-                                    <div class="alert alert-dismissable alert-success" id="Alert_Flash_dynamic">
+            <div class="row-fluid">
+                <div class="col-md-12">
+                    {% block flash_msg_top %}
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                <div class="alert alert-dismissable alert-success" id="Alert_Flash_dynamic">
 
 
-                                    {% for   message in messages %}
+                                {% for   message in messages %}
 
 
 
-                                        <p><i class="glyphicon glyphicon-info-sign"></i> {{ message | safe }}</p>
-                                    {% endfor %}
-                                {% endif %}
+                                    <p><i class="glyphicon glyphicon-info-sign"></i> {{ message | safe }}</p>
+                                {% endfor %}
+                            {% endif %}
 
 
-                            {% endwith %}
-                        </div>
-                        {%- endblock flash_msg_top %}
+                        {% endwith %}
                     </div>
+                    {%- endblock flash_msg_top %}
                 </div>
+            </div>
             <div class="row content-row">
                 {% block view_specific_left_col_buttons %}
 
@@ -119,61 +143,61 @@
 
 
                         <div class="col-md-3">
-                        <ul class="nav nav-pills nav-stacked">
+                            <ul class="nav nav-pills nav-stacked">
 
                                 {% for view_specific_left_col_button in navbar_view_specific_left_col_buttons %}
                                     {{ macros.render_navbar_link(*view_specific_left_col_button) }}
                                 {% endfor %}
 
-                        </ul>
-                    </div>
+                            </ul>
+                        </div>
                     {% endif %}
                 {%- endblock view_specific_left_col_buttons %}
                 <div class="container-fluid">
-                {% if navbar_view_specific_left_col_buttons |count != 0 %}
-                <div class="col-md-9">
+                    {% if navbar_view_specific_left_col_buttons |count != 0 %}
+                        <div class="col-md-9">
                     {% else %}
-                    <div class="col-md-12">
-                {% endif %}
-                 <!-- original value "col-md-9"" -->
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="col-md-12">
+                        <div class="col-md-12">
+                    {% endif %}
+                    <!-- original value "col-md-9"" -->
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
 
-                                    {% block content_1 %}
-                                    {%- endblock content_1 %}
+                                {% block content_1 %}
+                                {%- endblock content_1 %}
 
 
 
-                                    {% block content_2 %}
-                                    {%- endblock content_2 %}
-                                </div>
+                                {% block content_2 %}
+                                {%- endblock content_2 %}
                             </div>
                         </div>
                     </div>
-                </div>
+                    </div>
+                    </div>
 
                 </div>
             </div>
 
 
-{#            <div class=" navbar navbar-default navbar-inverse navbar">#}
-{##}
-{##}
-{#                <div class="container">#}
-{##}
-{#                    <div class="row">#}
-{#                        <div class="col-md-3">#}
-{##}
-{#                        </div>#}
-{#                        <div class="col-md-9" id="Footer_content">#}
-                            {% block content_footer %}
-                            {%- endblock content_footer %}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{##}
-{#            </div>#}
+            {#            <div class=" navbar navbar-default navbar-inverse navbar">#}
+            {##}
+            {##}
+            {#                <div class="container">#}
+            {##}
+            {#                    <div class="row">#}
+            {#                        <div class="col-md-3">#}
+            {##}
+            {#                        </div>#}
+            {#                        <div class="col-md-9" id="Footer_content">#}
+            {% block content_footer %}
+            {%- endblock content_footer %}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                </div>#}
+            {##}
+            {#            </div>#}
         {%- endblock body %}
         </body>
     {%- endblock html %}

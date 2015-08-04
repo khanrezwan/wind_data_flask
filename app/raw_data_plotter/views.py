@@ -1,13 +1,8 @@
 from datetime import datetime
 from dateutil import rrule
-from flask import render_template, session, redirect, url_for, request, flash, g, make_response, send_file, jsonify
+from flask import render_template, request, make_response, jsonify
 
-from flask import current_app as app
-
-import os
-import json
-import calendar
-import pygal
+from flask.ext.login import login_required
 
 # App specific imports
 
@@ -18,8 +13,6 @@ from .. import db
 from ..models import *
 from .json_builder import JsonBuilder
 
-
-
 Json_date_obj_pattern = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
@@ -28,9 +21,10 @@ Json_date_obj_pattern = '%Y-%m-%dT%H:%M:%S.%fZ'
 def class_tester():
     # query = Rawdata_plotter_helper.get_Data_Date_Single_Point(datetime.datetime(2015, 6, 22), 1)
     # query =Rawdata_plotter_helper.get_Data_Month_Range_24Hr(datetime.datetime(2015, 5, 1), datetime.datetime(2015, 6, 1), 1)
-    query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(datetime.datetime(2015, 6, 1),datetime.datetime(2015, 6, 30),1)
+    query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(datetime.datetime(2015, 6, 1),
+                                                                                  datetime.datetime(2015, 6, 30), 1)
     # query = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point_for_each_Month(datetime.datetime(2015, 4, 1), datetime.datetime(2015, 7, 20), 1)
-    #query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1), 1)
+    # query = Rawdata_plotter_helper.get_Data_Date_24Hr(datetime.datetime(2015, 5, 1), 1)
     # JsonBuilder.json_response(query, Xlabel=JsonBuilder.TIMESTAMP)
     (response, code) = JsonBuilder.json_response(query, Xlabel=JsonBuilder.DATE)
     return make_response(response, code)
@@ -42,11 +36,11 @@ def string_to_boolean(obj):
     elif obj == 'false':
         return False
     else:
-        raise ValueError('Did not receive \'true\' or \'false\'')\
-
+        raise ValueError('Did not receive \'true\' or \'false\'')
 
 
 @raw_data_plotter.route('/ngQueries', methods=['Get'])
+@login_required
 def get_ng_params():
     """
     This is the main route where angular JS will send query string
@@ -75,7 +69,7 @@ def get_ng_params():
     response = jsonify({'error': 'Did not route to any cases'})
     code = 404
     try:
-        start_date = datetime.datetime.strptime(start_date, Json_date_obj_pattern) # There must be at least one Date
+        start_date = datetime.datetime.strptime(start_date, Json_date_obj_pattern)  # There must be at least one Date
         if end_date:  # enddate may be None
             end_date = datetime.datetime.strptime(end_date, Json_date_obj_pattern)
     except ValueError:
@@ -121,11 +115,14 @@ def get_ng_params():
             if by_timestamp is False:
                 if show_individual_date_or_month is True:
                     print 'routing get_Data_Date_Range_Single_Point_for_each_Date'
-                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(start_date, end_date, sensor_id)
+                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(start_date,
+                                                                                                        end_date,
+                                                                                                        sensor_id)
                     (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
                 elif show_individual_date_or_month is False:
                     print 'routing get_Data_Date_Range_Single_Point'
-                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(start_date, end_date, sensor_id)
+                    helper_dict = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(start_date, end_date,
+                                                                                          sensor_id)
                     (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.DATE)
                 else:
                     return make_response(jsonify({'error': 'invalid choice combination'}), 404)
@@ -139,11 +136,14 @@ def get_ng_params():
             if by_timestamp is False:
                 if show_individual_date_or_month is True:
                     print 'routing .get_Data_Month_Range_Single_Point_for_each_Month'
-                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point_for_each_Month(start_date,end_date,sensor_id)
+                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point_for_each_Month(start_date,
+                                                                                                          end_date,
+                                                                                                          sensor_id)
                     (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
                 elif show_individual_date_or_month is False:
                     print 'routing .get_Data_Month_Range_Single_Point'
-                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(start_date, end_date, sensor_id)
+                    helper_dict = Rawdata_plotter_helper.get_Data_Month_Range_Single_Point(start_date, end_date,
+                                                                                           sensor_id)
                     (response, code) = JsonBuilder.json_response(helper_dict, Xlabel=JsonBuilder.MONTH)
                 else:
                     return make_response(jsonify({'error': 'invalid choice combination'}), 404)
@@ -162,6 +162,7 @@ def get_ng_params():
 
 
 @raw_data_plotter.route('/getLoggers', methods=['Get'])
+@login_required
 def get_loggers():
     logger_list = Logger.query
     if logger_list.count() == 0:
@@ -175,6 +176,7 @@ def get_loggers():
 
 
 @raw_data_plotter.route('/getSensors/<int:logger_id>', methods=['Get'])
+@login_required
 def get_sensors(logger_id):
     try:
         logger_id = int(logger_id)
@@ -192,6 +194,7 @@ def get_sensors(logger_id):
 
 
 @raw_data_plotter.route('/getSensorDetails/<int:sensor_id>', methods=['Get'])
+@login_required
 def get_sensor_details(sensor_id):
     try:
         sensor_id = int(sensor_id)
@@ -210,13 +213,14 @@ def get_sensor_details(sensor_id):
 
 
 @raw_data_plotter.route('/getAvailableDates/<int:sensor_id>', methods=['Get'])
+@login_required
 def get_sensors_available_dates(sensor_id):
     try:
         sensor_id = int(sensor_id)
     except ValueError:
         return make_response(jsonify({'error': 'sensor id must be an integer'}), 404)
     date = RawData.query.with_entities(db.func.min(RawData.date_time).label('min'),
-                                       db.func.max(RawData.date_time).label('max'))\
+                                       db.func.max(RawData.date_time).label('max')) \
         .filter(RawData.fk_sensor_id == sensor_id)
     # max_date = RawData.query.with_entities(db.func.max(RawData.date_time).label('date')).filter(RawData.fk_sensor_id == sensor_id).first()
     # min_date = db.session.query(db.func.min(RawData.date_time).label('min_date')).filter(RawData.fk_sensor_id == sensor_id).first() ## same effect
@@ -231,6 +235,7 @@ def get_sensors_available_dates(sensor_id):
 
             })
 
+
 @raw_data_plotter.route('/test_strings', methods=['Get'])
 def testing_query():
     # print request.query_string
@@ -242,7 +247,6 @@ def testing_query():
 
 
 @raw_data_plotter.route('/', methods=['Get'])
-def query_test():
-
-    return render_template('raw_data_plotter/query_tester.html')
-    pass
+@login_required
+def index():
+    return render_template('raw_data_plotter/index.html')
