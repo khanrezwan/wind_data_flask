@@ -220,7 +220,7 @@ def get_sensors_available_dates(sensor_id):
     except ValueError:
         return make_response(jsonify({'error': 'sensor id must be an integer'}), 404)
     date = RawData.query.with_entities(db.func.min(RawData.date_time).label('min'),
-                                       db.func.max(RawData.date_time).label('max')) \
+                                       db.func.max(RawData.date_time).label('max'))\
         .filter(RawData.fk_sensor_id == sensor_id)
     # max_date = RawData.query.with_entities(db.func.max(RawData.date_time).label('date')).filter(RawData.fk_sensor_id == sensor_id).first()
     # min_date = db.session.query(db.func.min(RawData.date_time).label('min_date')).filter(RawData.fk_sensor_id == sensor_id).first() ## same effect
