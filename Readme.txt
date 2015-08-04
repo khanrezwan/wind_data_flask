@@ -24,5 +24,6 @@ I will assume you are using virtualenv to install $ sudo apt-get install virtual
 [13] I have used wind_data_parser.py in views.index method
 [14] Finally run $ decativate to quit virtualenv
 
-ToDos:
-[1] Add bootstrap and jquery resources under static folder
+Deployment:
+1 gunicorn manage:app
+2. follow this guide https://realpython.com/blog/python/kickstarting-flask-on-ubuntu-setup-and-deployment/
