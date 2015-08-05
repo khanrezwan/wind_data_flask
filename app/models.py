@@ -118,16 +118,18 @@ class RawData(db.Model):
         if not isinstance(file_name, File):
             raise TypeError("Expecting File model")
         # ToDo-Rezwan older files had different timestamp...try both if both fails then catch exception. implemented subject to testing
-        if file_name.month_stamp > 3 and file_name.year_stamp == 2015:  # date format in file changed from april
-            try:
-                date = datetime.datetime.strptime(getdatalist[0], '%d/%m/%Y %H:%M:%S')  # in dd/mm/yyyy HH (24hr):MM:SS
-            except ValueError:
-                raise ValueError('unexpected date time in input file')
-        else:
-            try:
-                date = datetime.datetime.strptime(getdatalist[0], '%m/%d/%Y %H:%M:%S')
-            except ValueError:
-                raise ValueError('unexpected date time in input file')
+        # if file_name.month_stamp > 3 and file_name.year_stamp <= 2015:  # date format in file changed from april
+        try:
+            date = datetime.datetime.strptime(getdatalist[0], '%d/%m/%Y %H:%M:%S')  # in dd/mm/yyyy HH (24hr):MM:SS
+        except ValueError:
+            print 'date ', getdatalist[0], ' filename', file_name.filename
+            raise ValueError('unexpected date time in input file', )
+        # else:
+        #     try:
+        #         date = datetime.datetime.strptime(getdatalist[0], '%m/%d/%Y %H:%M:%S')
+        #     except ValueError:
+        #         print 'date ', getdatalist[0], ' filename', file_name.filename
+        #         raise ValueError('unexpected date time in input file')
 
         single_channel = list()  # empty list for raw data of single channel
         dataList = getdatalist[1:]  # datalist starts from second parameter as 1st one is datetime field

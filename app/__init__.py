@@ -7,6 +7,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from config import config
 from flask.ext.admin import Admin
+from datetime import  timedelta
 # from flask_admin import Admin
 
 #App Sepcific imports
@@ -32,6 +33,11 @@ def create_app(config_name):
     db.init_app(app)
     login_manager.init_app(app)
     admin.init_app(app)
+    # Todo-rezwan follow this guide for auto renewing session
+    # http://stackoverflow.com/questions/19760486/resetting-the-expiration-time-for-a-cookie-in-flask
+    # http://stackoverflow.com/questions/19760486/resetting-the-expiration-time-for-a-cookie-in-flask
+    app.permanent_session_lifetime = timedelta(hours=2)  # adding session time out. working
+
     # attach routes and custom error pages here
     from main import main as main_blueprint
     app.register_blueprint(main_blueprint)

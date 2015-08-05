@@ -28,6 +28,9 @@
                           rel="stylesheet" type="text/css">
 
                 {%- endblock styles %}
+                {%- block favicon %}
+                    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+                {%- endblock favicon  %}
             {%- endblock head %}
         </head>
 
