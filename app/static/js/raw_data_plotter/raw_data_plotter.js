@@ -20,8 +20,7 @@ var app = angular.module('myApp', ['ui.bootstrap', "chart.js"]);
 // http://jtblin.github.io/angular-chart.js/#getting_started
 //http://angular-ui.github.io/bootstrap/
 app.controller('myCtrl', function ($scope, $http, $window) {
-
-
+    //for angular chart-js
     $scope.labels = [''];
     $scope.table_data = [];
     $scope.series = [''];
@@ -72,7 +71,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         'datepicker-mode': "'month'",
         'min-mode': "month",
         'showWeeks': "false",
-         'close-on-date-selection': "true"
+        'close-on-date-selection': "true"
     };
 
     $scope.dateOptions_day = {
@@ -122,34 +121,34 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         //for chart
         $scope.labels = [];//X
         $scope.series = [];//Series name
-        $scope.data = [ ]; //Y
+        $scope.data = []; //Y
     };
 
-   /* sensor_id = int. must be sent
- start_date = json date, use in case of single date or month case, must be sent
- end_date = json date, optional, for range cases
+    /* sensor_id = int. must be sent
+     start_date = json date, use in case of single date or month case, must be sent
+     end_date = json date, optional, for range cases
 
- Must send by_month or by_date
- by_month = bool, optional, for plots with months
- by_date = bool, optional, for plots with dates
+     Must send by_month or by_date
+     by_month = bool, optional, for plots with months
+     by_date = bool, optional, for plots with dates
 
- Must send one of following
- by_timestamp = bool, optional, for 24hr cases
- show_individual_date_or_month = bool, optional, for single point multiple dates or months
-    * */
+     Must send one of following
+     by_timestamp = bool, optional, for 24hr cases
+     show_individual_date_or_month = bool, optional, for single point multiple dates or months
+     * */
     $scope.send_query = function () //Testing query string params for get and data for post
     {
         $http
-            .get('ngQueries', {params:
-            {
-                sensor_id: $scope.sensor.id,
-                start_date: $scope.start_date,
-                end_date: $scope.end_date,
-                by_month: $scope.by_month,
-                by_date: $scope.by_date,
-                by_timestamp: $scope.by_timestamp,
-                show_individual_date_or_month: $scope.show_individual_date_or_month
-            }
+            .get('ngQueries', {
+                params: {
+                    sensor_id: $scope.sensor.id,
+                    start_date: $scope.start_date,
+                    end_date: $scope.end_date,
+                    by_month: $scope.by_month,
+                    by_date: $scope.by_date,
+                    by_timestamp: $scope.by_timestamp,
+                    show_individual_date_or_month: $scope.show_individual_date_or_month
+                }
             })
             .success(function (data, status, headers, config) {
                 if (data.success) {
@@ -167,27 +166,25 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             });
 
     };
-    $scope.process_plot_data=function(data)
-    {
-         $scope.msg = 'Loaded dataList' + " " + data.plot_data.length;
+    $scope.process_plot_data = function (data) {
+        $scope.msg = 'Loaded dataList' + " " + data.plot_data.length;
         //var count =0;
         var temp_X = [];
         var temp_Y = [];
-         $scope.table_data = [];
+        $scope.table_data = [];
         $scope.plot_title = '';
         $scope.plot_footer = '';
         var display = '';
-        $scope.labels=[];
+        $scope.labels = [];
         $scope.data = [];
-        $scope.series=[];
-        for (var i=0;i<data.plot_data.length;i++)
-        {
+        $scope.series = [];
+        for (var i = 0; i < data.plot_data.length; i++) {
             //display = display + " "+ data.plot_data[i].Y.ch_avg;
             temp_X.push(data.plot_data[i].X);
             temp_Y.push(parseFloat(data.plot_data[i].Y.ch_avg));
         }
-         $scope.table_data = data.plot_data;
-         $scope.plot_title = data.y_label;
+        $scope.table_data = data.plot_data;
+        $scope.plot_title = data.y_label;
         $scope.plot_footer = data.x_label;
         //$scope.msg = display;
         //{
@@ -197,7 +194,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         //    count = count+1;
         //    //$scope.data.push(item.Y.ch_avg);
         //}
-        $scope.labels.push.apply($scope.labels,temp_X);
+        $scope.labels.push.apply($scope.labels, temp_X);
 
         $scope.data = new Array(1);
         $scope.data[0] = new Array(temp_Y.length);
@@ -208,8 +205,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         //    'tooltipFontSize': '20'
         //
         //};
-        for(var j = 0; j<temp_Y.length;j++)
-        {
+        for (var j = 0; j < temp_Y.length; j++) {
             $scope.data[0][j] = temp_Y[j];
         }
 
@@ -219,14 +215,14 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         //{
         //     display = display + " label = "+ $scope.labels[i] +" data = "+ $scope.data[i];
         //}
-    //     $scope.labels = ['0:00','0:10','0:20'];
-    //$scope.series = ['Series A','Series B'];
-    //
-    //
-    //$scope.data = [
-    //    [1.2,1.3,1.4],
-    //    [1.2,10.3,2.4]
-    //];
+        //     $scope.labels = ['0:00','0:10','0:20'];
+        //$scope.series = ['Series A','Series B'];
+        //
+        //
+        //$scope.data = [
+        //    [1.2,1.3,1.4],
+        //    [1.2,10.3,2.4]
+        //];
         $scope.show_plot = true;
     };
     $scope.init_logger = function () {
@@ -460,34 +456,29 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
     };
 
-    $scope.option_plot_type=function(option_value)
-    {
+    $scope.option_plot_type = function (option_value) {
         //step 5
         //$scope.show_step_5 = false;
         $scope.show_button = false;
         $scope.show_plot = false;
         $scope.by_timestamp = false;
         $scope.show_individual_date_or_month = false;
-        if (option_value.valueOf()=='singlevalue')
-        {
+        if (option_value.valueOf() == 'singlevalue') {
             $scope.by_timestamp = false;
             $scope.show_individual_date_or_month = false;
             $scope.show_button = true;
         }
-        else if (option_value.valueOf()=='individual')
-        {
+        else if (option_value.valueOf() == 'individual') {
             $scope.by_timestamp = false;
             $scope.show_individual_date_or_month = true;
             $scope.show_button = true;
         }
-        else if (option_value.valueOf()=='timestamp')
-        {
+        else if (option_value.valueOf() == 'timestamp') {
             $scope.by_timestamp = true;
             $scope.show_individual_date_or_month = false;
             $scope.show_button = true;
         }
-        else
-        {
+        else {
             $scope.msg = 'got' + option_value;
             $scope.show_step_5 = false;
             $scope.show_button = false;

@@ -1,9 +1,10 @@
 <!-- Todo redesign the UI-->
-<h3>Raw Data Plotter UI</h3>
+<!-- Todo Add option for ch_min, ch_avg and ch_max -->
+<h3 id="non-printable">Raw Data Plotter UI</h3>
 <!-- Angular JS App begin-->
 <div ng-app="myApp" ng-controller="myCtrl"><!-- Angular JS DIV Start -->
     <!--flasher for testing -->
-    <div  id="non-printable" id="non-printable" class="alert alert-dismissable alert-success" id="Alert_Flash_dynamic">
+    <div id="non-printable" id="non-printable" class="alert alert-dismissable alert-success" id="Alert_Flash_dynamic">
         {{ '{{' }} msg {{ '}}' }}
     </div>
     <div class="row-fluid">
@@ -291,29 +292,29 @@
             <div class="container-fluid" ng-if="show_plot">
                 <!-- keep plot inside ng-if the dom must be created to  update new data-->
                 <div class="row">
-                                 <!-- Step 6 start -->
-                     <div class="col-md-12" id="non-printable">
-            <div class="panel panel-primary" id="plot_style">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Step 6: Select Plot style</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12 text-center">
-                            <div class="btn-group">
-                                <label class="btn btn-success" ng-model="value_step_6"
-                                       btn-radio="'bar'" >Bar graph</label>
-                                <label class="btn btn-success" ng-model="value_step_6"
-                                       btn-radio="'line'">Line graph</label>
-
+                    <!-- Step 6 start -->
+                    <div class="col-md-12" id="non-printable">
+                        <div class="panel panel-primary" id="plot_style">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Step 6: Select Plot style</h3>
                             </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <div class="btn-group">
+                                            <label class="btn btn-success" ng-model="value_step_6"
+                                                   btn-radio="'bar'">Bar graph</label>
+                                            <label class="btn btn-success" ng-model="value_step_6"
+                                                   btn-radio="'line'">Line graph</label>
 
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                </div>
-            </div>
-            <!-- Step 6 end -->
+                    <!-- Step 6 end -->
 
                 </div>
                 <div class="row" id="printable">
@@ -326,48 +327,57 @@
 
                                 <!-- AngularJS Charts Start-->
                                 <div ng-if="value_step_6=='line'">
-                                <canvas id="line" class="chart chart-line" data="data" labels="labels"></canvas>
-                                    </div>
-                                 <div ng-if="value_step_6=='bar'">
-                                <canvas id="line" class="chart chart-bar" data="data" labels="labels"></canvas>
-                                    </div>
+                                    {#                                <canvas id="line_plot" class="chart chart-line" data="data" labels="labels" width="2560" height="1920" style = 'width:640px; height:480px;'></canvas>#}
+                                    <canvas id="line_plot" class="chart chart-line" data="data"
+                                            labels="labels"></canvas>
+                                </div>
+                                <div ng-if="value_step_6=='bar'">
+                                    {#                                <canvas id="bar_plot" class="chart chart-bar" data="data" labels="labels" width="2560" height="1920" style = 'width:640px; height:480px;' ></canvas>#}
+
+                                    <canvas id="bar_plot" class="chart chart-bar" data="data" labels="labels"></canvas>
+                                </div>
                                 <!-- AngularJS Charts End-->
                                 <h2 class="panel-title text-center">{{ '{{' }} plot_footer{{ '}}' }}</h2>
                             </div>
                         </div>
+
                     </div>
+
                 </div>
                 <!-- Tabulate data start-->
-            <button type="button" class="btn btn-primary" ng-model="show_plot_data" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0" id="non-printable">
-        Show Plot Data
-        </button>
-            <div ng-show="show_plot_data" id="printable">
-            <div class="row">
-                <div class="col-md-12">
-                     <table class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th class="text-center">#</th>
-                  <th class="text-center">X ({{ '{{' }} plot_footer{{ '}}' }})</th>
-                  <th class="text-center">Y ({{ '{{' }} sensor.units {{ '}}' }})</th>
+                <button type="button" class="btn btn-primary" ng-model="show_plot_data" btn-checkbox
+                        btn-checkbox-true="1" btn-checkbox-false="0" id="non-printable">
+                    Show Plot Data
+                </button>
 
-                </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="item in table_data">
-                  <td class="text-center"> {{ '{{' }} $index+1{{ '}}' }}</td>
-                  <td class="text-center">{{ '{{' }} item.X{{ '}}' }}</td>
-                  <td class="text-center">{{ '{{' }} item.Y.ch_avg {{ '}}' }}</td>
+                <div ng-show="show_plot_data" id="printable">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th class="text-center">X ({{ '{{' }} plot_footer{{ '}}' }})</th>
+                                    <th class="text-center">Y ({{ '{{' }} sensor.units {{ '}}' }})</th>
 
-                </tr>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="item in table_data">
+                                    <td class="text-center"> {{ '{{' }} $index+1{{ '}}' }}</td>
+                                    <td class="text-center">{{ '{{' }} item.X{{ '}}' }}</td>
+                                    <td class="text-center">{{ '{{' }} item.Y.ch_avg {{ '}}' }}</td>
 
-              </tbody>
-            </table>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+                <!-- Tabulate data end-->
             </div>
-            </div>
-        <!-- Tabulate data end-->
-            </div><!-- Plot end -->
+            <!-- Plot end -->
 
         </div>
 
@@ -377,6 +387,7 @@
 
 
 <script type="text/javascript" src="
+
 
 
 
