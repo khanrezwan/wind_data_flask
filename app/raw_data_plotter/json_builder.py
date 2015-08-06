@@ -249,7 +249,7 @@ class JsonBuilder(object):
             return 'Date'
             pass
         elif Xlabel == JsonBuilder.MONTH:
-            return 'Month'
+            return 'Month '
             pass
         elif Xlabel == JsonBuilder.TIMESTAMP: # pass a string time_stamp not datetime
             return 'HH:MM'

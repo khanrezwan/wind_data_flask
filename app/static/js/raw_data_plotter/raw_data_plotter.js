@@ -23,9 +23,10 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
 
     $scope.labels = [''];
+    $scope.table_data = [];
     $scope.series = [''];
-
-
+    $scope.plot_title = '';
+    $scope.plot_footer = '';
     $scope.data = [
         []
     ]; //list of list
@@ -172,6 +173,9 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         //var count =0;
         var temp_X = [];
         var temp_Y = [];
+         $scope.table_data = [];
+        $scope.plot_title = '';
+        $scope.plot_footer = '';
         var display = '';
         $scope.labels=[];
         $scope.data = [];
@@ -182,8 +186,9 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             temp_X.push(data.plot_data[i].X);
             temp_Y.push(parseFloat(data.plot_data[i].Y.ch_avg));
         }
-
-
+         $scope.table_data = data.plot_data;
+         $scope.plot_title = data.y_label;
+        $scope.plot_footer = data.x_label;
         //$scope.msg = display;
         //{
         //   temp_X.push(data.plot_data[i].X);

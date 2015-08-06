@@ -23,7 +23,7 @@
 
 {% block title %}
     {# Add your Codes Here   #}
-    Query Tester
+    Wind Data Viewer
 {% endblock %}
 {% block metas %}
     {{ super() }}
@@ -52,6 +52,18 @@
     <!-- Styless for Angular.JS Charts library  -->
     <link href="{{ url_for('static', filename='css/lib/angular-chart.css') }}"
           rel="stylesheet" type="text/css">
+    <!--print support -->
+    <style type="text/css">
+
+{#    <!-- from http://stackoverflow.com/questions/468881/print-div-id-printarea-div-only-->#}
+
+    @media print
+    {
+    	#non-printable { display: none; }
+    	#printable { display: block; }
+    }
+    </style>
+    <!-- -->
 {%- endblock %}
 
 {% block body_attribs %}
