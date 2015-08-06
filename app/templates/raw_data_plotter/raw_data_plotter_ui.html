@@ -302,8 +302,7 @@
                         <div class="col-md-12 text-center">
                             <div class="btn-group">
                                 <label class="btn btn-success" ng-model="value_step_6"
-                                       btn-radio="'bar'" >Bar graph
-                                    value</label>
+                                       btn-radio="'bar'" >Bar graph</label>
                                 <label class="btn btn-success" ng-model="value_step_6"
                                        btn-radio="'line'">Line graph</label>
 
@@ -348,17 +347,17 @@
                      <table class="table table-bordered table-striped">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>X ({{ '{{' }} plot_footer{{ '}}' }})</th>
-                  <th>Y ({{ '{{' }} sensor.units {{ '}}' }})</th>
+                  <th class="text-center">#</th>
+                  <th class="text-center">X ({{ '{{' }} plot_footer{{ '}}' }})</th>
+                  <th class="text-center">Y ({{ '{{' }} sensor.units {{ '}}' }})</th>
 
                 </tr>
               </thead>
               <tbody>
                 <tr ng-repeat="item in table_data">
-                  <td> {{ '{{' }} $index+1{{ '}}' }}</td>
-                  <td>{{ '{{' }} item.X{{ '}}' }}</td>
-                  <td>{{ '{{' }} item.Y.ch_avg {{ '}}' }}</td>
+                  <td class="text-center"> {{ '{{' }} $index+1{{ '}}' }}</td>
+                  <td class="text-center">{{ '{{' }} item.X{{ '}}' }}</td>
+                  <td class="text-center">{{ '{{' }} item.Y.ch_avg {{ '}}' }}</td>
 
                 </tr>
 
