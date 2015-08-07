@@ -27,3 +27,10 @@ I will assume you are using virtualenv to install $ sudo apt-get install virtual
 Deployment:
 1 gunicorn manage:app
 2. follow this guide https://realpython.com/blog/python/kickstarting-flask-on-ubuntu-setup-and-deployment/
+
+Todo 1) Home page with some valuable info for authenticated users
+Todo 2) Clean up routes
+Todo 3) Clean up debug prints
+Todo 4) User to change password
+Todo 5) User to update profile
+Todo 6) Add Copyright

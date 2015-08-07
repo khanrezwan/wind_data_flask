@@ -84,7 +84,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     };
 
 
-    $scope.msg = "Debugging";
+
     $scope.reset_controller_variables = function () {
         $scope.init_logger();
         //ui panel for ng-show
@@ -167,7 +167,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
     };
     $scope.process_plot_data = function (data) {
-        $scope.msg = 'Loaded dataList' + " " + data.plot_data.length;
+
         //var count =0;
         var temp_X = [];
         var temp_Y = [];
@@ -226,7 +226,6 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_plot = true;
     };
     $scope.init_logger = function () {
-        $scope.msg = "inside send to loggerlist";
         $http
             .get('getLoggers')
             .success(function (data, status, headers, config) {
@@ -234,7 +233,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
                     $scope.logger_list = data.loggerList;
                     //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
-                    $scope.msg = 'Loaded loggerList' + " " + $scope.logger_list.length;
+
                 } else {
                     $window.alert('Retrieval failed 22');
                 }
@@ -254,7 +253,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_step_5 = false;
         $scope.show_button = false;
         $scope.show_plot = false;
-        $scope.msg = "inside send to sensorlist";
+
         $http
             .get('getSensors/' + logger_id)
             .success(function (data, status, headers, config) {
@@ -262,7 +261,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
                     $scope.sensor_list = data.sensorList;
 
-                    $scope.msg = 'Loaded sensorList' + " " + $scope.sensor_list.length;
+
                     $scope.show_step_2 = true;
                 } else {
                     $window.alert('Retrieval failed 22');
@@ -281,7 +280,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_button = false;
         $scope.show_plot = false;
         $scope.sensor_id_from_step_2 = sensor_select_value;
-        $scope.msg = 'Id of the selected sensor ' + $scope.sensor_id_from_step_2;
+
 
         $http
             .get('getSensorDetails/' + $scope.sensor_id_from_step_2)
@@ -290,7 +289,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
                     $scope.sensor = data.sensor;
                     //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
-                    $scope.msg = 'Loaded Sensor details' + " " + $scope.sensor.id;
+
                     $scope.sensor_id_from_step_2 = $scope.sensor.id;
                     $scope.get_maximum_minimum_dates_of_available_data($scope.sensor.id);
                     $scope.show_step_3 = true;
@@ -346,7 +345,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         //after step 3b
         if (option.valueOf() == 'single') {
             //set up calendar
-            $scope.msg = 'got single';
+
             $scope.show_start_date_calendar = true;
             $scope.show_end_date_calendar = false;
             $scope.end_date = null;
@@ -355,7 +354,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         }
         else if (option.valueOf() == 'range') {
             //set up calendar
-            $scope.msg = 'got range';
+
             $scope.show_start_date_calendar = true;
             $scope.show_end_date_calendar = true;
             $scope.end_date = null;
@@ -363,7 +362,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             $scope.show_step_4 = true;
         }
         else {
-            $scope.msg = 'got' + option;
+
             $scope.show_start_date_calendar = false;
             $scope.show_end_date_calendar = false;
             $scope.end_date = null;
@@ -381,7 +380,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
                     $scope.min_date = new Date(data.min_date);
                     $scope.max_date = new Date(data.max_date);
                     //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
-                    $scope.msg = 'got min date' + " " + $scope.min_date + " and max Date " + $scope.max_date;
+
                     $scope.minDate = $scope.min_date;
                     $scope.maxDate = $scope.max_date;
 
@@ -479,7 +478,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
             $scope.show_button = true;
         }
         else {
-            $scope.msg = 'got' + option_value;
+
             $scope.show_step_5 = false;
             $scope.show_button = false;
             $scope.show_plot = false;
