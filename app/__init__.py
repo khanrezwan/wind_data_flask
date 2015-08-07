@@ -36,7 +36,7 @@ def create_app(config_name):
     # Todo-rezwan follow this guide for auto renewing session
     # http://stackoverflow.com/questions/19760486/resetting-the-expiration-time-for-a-cookie-in-flask
     # http://stackoverflow.com/questions/19760486/resetting-the-expiration-time-for-a-cookie-in-flask
-    app.permanent_session_lifetime = timedelta(hours=2)  # adding session time out. working
+    app.permanent_session_lifetime = timedelta(minutes=60)  # adding session time out. working
 
     # attach routes and custom error pages here
     from main import main as main_blueprint

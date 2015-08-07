@@ -4,28 +4,22 @@ from app import db
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 
-
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    """
-     A function that listens to sqlite connection and turns on paragma foreign_key parameter to enforce cascade delete
-     and updates. passive delete will not work without this helper
-    :param dbapi_connection:
-    :param connection_record:
-    :return:
-    """
-
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
-
-# engine = create_engine('sqlite:///wind_data_test.db', echo=False)  # Create database
+############# Uncomment if using Sqlite##########################################################
+# @event.listens_for(Engine, "connect")
+# def set_sqlite_pragma(dbapi_connection, connection_record):
+#     """
+#      A function that listens to sqlite connection and turns on paragma foreign_key parameter to enforce cascade delete
+#      and updates. passive delete will not work without this helper
+#     :param dbapi_connection:
+#     :param connection_record:
+#     :return:
+#     """
 #
-# Base = declarative_base()  # sqlalchemy model intialization
+#     cursor = dbapi_connection.cursor()
+#     cursor.execute("PRAGMA foreign_keys=ON")
+#     cursor.close()
+###################################################################################################
 
-# Create a session
-# Session = sessionmaker(bind=engine)
-# session = Session()
 
 
 class SqlInterface(object):
@@ -58,7 +52,7 @@ class RawData(db.Model):
     """
     __tablename__ = 'rawdata'
     id = db.Column(db.Integer, primary_key=True)
-    fk_filename = db.Column(db.String, db.ForeignKey("files.filename", ondelete="Cascade", onupdate="Cascade"), index=True)  # Foreign Key
+    fk_filename = db.Column(db.String(256), db.ForeignKey("files.filename", ondelete="Cascade", onupdate="Cascade"), index=True)  # Foreign Key
     fk_sensor_id = db.Column(db.Integer, db.ForeignKey("sensors.id", ondelete="Cascade"), index=True)  # Foreign Key
     # Use date_time for MySQL/ Postgresql i.e. DBMS with built-in date time support.
     # datetime.datetime.strptime(RawData.date_time, '%Y-%m-%d %H:%M:%S.%f')
@@ -165,7 +159,7 @@ class File(db.Model, SqlInterface):
 
     """
     __tablename__ = 'files'
-    filename = db.Column(db.String, primary_key=True, index=True)
+    filename = db.Column(db.String(128), primary_key=True, index=True)
     fileno = db.Column(db.Integer, nullable=True)
     site = db.Column(db.Integer, nullable=False)
     date = db.Column(db.Date, nullable=False)
@@ -231,12 +225,12 @@ class Site(db.Model, SqlInterface):
     """
     __tablename__ = 'sites'
     _id = db.Column(db.Integer, primary_key=True, index=True)
-    description = db.Column(db.String, nullable=False)
-    projectCode = db.Column(db.String, nullable=False)
-    location = db.Column(db.String)
-    elevation = db.Column(db.String, nullable=False)
-    latitude = db.Column(db.String, nullable=False)
-    longitude = db.Column(db.String, nullable=False)
+    description = db.Column(db.String(256), nullable=False)
+    projectCode = db.Column(db.String(64), nullable=False)
+    location = db.Column(db.String(64))
+    elevation = db.Column(db.String(128), nullable=False)
+    latitude = db.Column(db.String(128), nullable=False)
+    longitude = db.Column(db.String(128), nullable=False)
     timeOffset = db.Column(db.Float, nullable=False)
     # fk_logger_id = Column(Integer, ForeignKey("loggers.id", ondelete="Cascade"))
     logger = db.relationship("Logger", passive_deletes=True, backref=db.backref('sites', order_by=_id), uselist=False)
@@ -297,7 +291,7 @@ class Logger(db.Model, SqlInterface):
     id = db.Column(db.Integer, primary_key=True)
     model = db.Column(db.Integer, nullable=False)
     serial = db.Column(db.Integer, nullable=False, index=True)
-    hw_rev = db.Column(db.String, nullable=False)
+    hw_rev = db.Column(db.String(64), nullable=False)
     fk_site_id = db.Column(db.Integer, db.ForeignKey("sites._id", ondelete="Cascade"))  # Foreign Key
 
     sensors = db.relationship("Sensor", passive_deletes=True, backref=db.backref("loggers", order_by=id))  # 1 to m relation
@@ -358,13 +352,13 @@ class Sensor(db.Model, SqlInterface):
 
     channel = db.Column(db.Integer, index=True)
     _type = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String, nullable=False)
-    details = db.Column(db.String, nullable=True)
+    description = db.Column(db.String(256), nullable=False)
+    details = db.Column(db.String(128), nullable=True)
     serialNo = db.Column(db.Integer, nullable=False)
     height = db.Column(db.Float, nullable=False)
     scaleFactor = db.Column(db.Float, nullable=False)
     offset = db.Column(db.Float, nullable=False)
-    units = db.Column(db.String, nullable=False)
+    units = db.Column(db.String(64), nullable=False)
     fk_logger_id = db.Column(db.Integer, db.ForeignKey("loggers.id", ondelete="Cascade"),index=True)  #Foreign Key
 
     files = db.relationship('File', secondary='rawdata', passive_deletes=True)  # m:m relationship

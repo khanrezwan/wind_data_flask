@@ -37,7 +37,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+                              'mysql://usdk_db_admin:abc123@localhost/usdk_wind_data_DB'
 
 
 config = {'development': DevelopmentConfig,

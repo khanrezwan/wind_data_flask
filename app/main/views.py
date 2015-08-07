@@ -29,6 +29,8 @@ def index():
 @requires_roles('admin')
 def upload():
     process = False
+    authenticated_files_count = 0
+    illegal_files_count = 0
     # form object to pass into render template
     form = UploadForm()
     # check if the request method and fieldname is correct in incoming request
@@ -61,12 +63,15 @@ def upload():
                     filelist.append({'filename':str(file.filename), 'path':str(filepath)})
                     # save the file temporarily
                     file.save(filepath)
+                    authenticated_files_count += 1
                     # flash messages about the current operation
-                    flash('"%s" is saved at "%s"' % (filename, filepath), 'success')
+                    # flash('"%s" is saved at "%s"' % (filename, filepath), 'success')
                     process = True
                 else:
-                    flash('Filename is not from trusted source', 'error')
+                    # flash('Filename is not from trusted source', 'error')
+                    illegal_files_count += 1
                     # process = False
+
                 # To do:
                 # var folderpath and list filelist should be passed to the parser at this point.
                 # Status of success or failure could be returned with a list of msgs,
@@ -77,6 +82,11 @@ def upload():
             process = False
             flash('No files selected', 'error')
         # reload page
+        if authenticated_files_count:
+            flash('Files uploaded ' + str(authenticated_files_count))
+        if illegal_files_count:
+            flash('Files Not uploaded ' + str(illegal_files_count))
+
         return render_template('upload.html', form=form, process=process)
         # return redirect(request.path)
     return render_template('upload.html', form=form, process=process)
