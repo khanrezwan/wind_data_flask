@@ -96,9 +96,9 @@
                                     <a href="{{ url_for('auth.login') }}"><i class=" glyphicon glyphicon-log-in"></i>
                                         Log In</a>
                                 </li>
-                                <li class="pull-left">
-                                    <a href="{{ url_for('auth.registeruser') }}">Register</a>
-                                </li>
+{#                                <li class="pull-left">#}
+{#                                    <a href="{{ url_for('auth.registeruser') }}">Register</a>#}
+{#                                </li>#}
                             {% else %}
                                 <li class="pull-left">
                                     <a href="#"><i class=" glyphicon glyphicon-user"></i> {{ current_user.username }}

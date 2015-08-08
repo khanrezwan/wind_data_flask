@@ -87,10 +87,12 @@ def logout():
 # Register #
 ##########
 @auth.route('/register', methods=['GET', 'POST'])
+@login_required
+@requires_roles('admin')
 def registeruser():
-    if current_user.is_authenticated():
-        flash('You are already logged in. <a href=\"%s\">Logout?</a>' % url_for('auth.logout'))
-        return redirect('/')
+    # if current_user.is_authenticated():
+    #     flash('You are already logged in. <a href=\"%s\">Logout?</a>' % url_for('auth.logout'))
+    #     return redirect('/')
     form = RegisterUser()
     form.choices = [("none", "----------")]
 
@@ -122,8 +124,8 @@ def registeruser():
 # Add Roles #
 ##########
 @auth.route('/addRole', methods=['GET', 'POST'])
-# @login_required
-# @requires_roles('admin')
+@login_required
+@requires_roles('admin')
 def addrole():
     form = AddRoles()
     if request.method == 'POST' and form.validate_on_submit():
