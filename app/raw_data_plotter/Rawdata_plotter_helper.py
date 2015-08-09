@@ -16,6 +16,14 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def dictionary_builder(query, date=None, sensor_id=None, time_stamp=None):
+        """
+        This dictionary is built by each query functions and sent Json builder class for JSON response
+        :param query: Flask-SqlAlchemy object may be a list or single object.
+        :param date: python datetime.datetime object maybe list, tuple or single object
+        :param sensor_id: integer
+        :param time_stamp: defaults to None. it is used by 24hr queries. sends a list of strings..e.g. ['00:00', '00:10'...
+        :return: returns a dictionary using the parameters
+        """
         return {
             "query": query,
             "date": date,
@@ -27,20 +35,27 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Date_24Hr(date, sensor_id):
-        if isinstance(date, datetime.datetime):
+        """
+        queries for 24hr data for a particular date for a particular sensor.
+        :param date: python datetime.datetime object
+        :param sensor_id: integer
+        :return: returns a dict of query result, date (single datetime.datetime object), sensor_id (integer)
+        and list of HH:MM strings
+        """
+        if isinstance(date, datetime.datetime):  # check if param date is python datetime object
             try:
-                sensor_id = int(sensor_id)
+                sensor_id = int(sensor_id)  # check if sensor_id is an integer
             except ValueError:
-                raise ValueError('sensor_id must be an integer')
+                raise ValueError('sensor_id must be an integer') # if fails raise Value error
             query = RawData.query.filter(
                 RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
-                RawData.fk_sensor_id == sensor_id)
+                RawData.fk_sensor_id == sensor_id)  # get data for all available data of date for sensor_id
             query_distinct_time_stamps = RawData.query.with_entities(RawData.time_stamp.distinct().label('time_stamp')).filter(
                 RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
-                RawData.fk_sensor_id == sensor_id)
+                RawData.fk_sensor_id == sensor_id)  # get distinct time_stamp for that date. reason you may not have data for all time intevals
             time_stamp_list = list()
 
-            for item in query_distinct_time_stamps.all():
+            for item in query_distinct_time_stamps.all():  # create a list of time_stamps from query
                 time_stamp_list.append(item.time_stamp)
             # print query.count()
             # return query
@@ -52,18 +67,24 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Date_Single_Point(date, sensor_id):
+        """
+        queries for avg value for a senspr on a particular date
+        :param date: python datetime.datetime object
+        :param sensor_id: integer
+        :return: returns a dict of query result (single sqlalchemy object with count one), date (single datetime.datetime object), sensor_id (integer)
+        """
         if isinstance(date, datetime.datetime):
             try:
                 sensor_id = int(sensor_id)
             except ValueError:
                 raise ValueError('sensor_id must be an integer')
+            # query for avg need to use with_entities and sqlalchemy built in db function db.func.avg
             query = RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
                                                 db.func.avg(RawData.ch_max).label('ch_max'),
                                                 db.func.avg(RawData.ch_avg).label('ch_avg')).\
                 filter(RawData.yearmonthdate_stamp == str(date.year) + str(date.month) + str(date.day),
                        RawData.fk_sensor_id == sensor_id)
-            # print query.count()
-            # return query
+
             return Rawdata_plotter_helper.dictionary_builder(query, date=date, sensor_id=sensor_id)
         else:
             raise TypeError('date must be of type datetime.datetime')
@@ -71,6 +92,17 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Date_Range_24Hr(startDate, endDate, sensor_id):
+        """
+        queries for 24hr time_stamp view for a range of dates
+        :param startDate: Start date
+        @:type startDate: datetime.datetime
+        :param endDate: End date
+        @:type endDate: datetime.datetime
+        :param sensor_id: Sensor id from database table
+        @:type sensor_id: int
+        :return: returns a dict of query result ( list of sqlalchemy query object with count one),
+        date (tuple of datetime.datetime object), sensor_id (integer) and list of HH:MM strings
+        """
         if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
             if endDate >= startDate:
                 try:
@@ -160,7 +192,7 @@ class Rawdata_plotter_helper(object):
                     raise ValueError('sensor_id must be an integer')
                 query_list = list()
                 date_list = list()
-                for dt in rrule.rrule(rrule.DAILY, dtstart=startDate,until=endDate):
+                for dt in rrule.rrule(rrule.DAILY, dtstart=startDate, until=endDate):
                     res = Rawdata_plotter_helper.get_Data_Date_Single_Point(dt, sensor_id)
                     query = res['query']
                     query_list.append(query)

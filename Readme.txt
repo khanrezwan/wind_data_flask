@@ -25,13 +25,16 @@ I will assume you are using virtualenv to install $ sudo apt-get install virtual
 [14] Finally run $ decativate to quit virtualenv
 
 Deployment:
-1 gunicorn -t 600 manage:app
+1 gunicorn --daemon --bind 127.0.0.1:8000 --timeout 600 --workers 4 --threads 2 manage:app
+1 Might want to test the --daemon in gunicorn
 2. follow this guide https://realpython.com/blog/python/kickstarting-flask-on-ubuntu-setup-and-deployment/
 3. before pip install MySQL-python: sudo apt-get install libmysqlclient-dev
 4. in /etc/nginx/nginx.conf add these lines under http
 # set client body size to 50M #
 client_max_body_size 50M;
-
+# proxy read timeout
+proxy_read_timeout 600s;
+5. for nginx settings goto http://wiki.nginx.org/HttpProxyModule#proxy_read_timeout
 Todo 1) Home page with some valuable info for authenticated users
 Todo 2) Clean up routes
 Todo 3) Clean up debug prints

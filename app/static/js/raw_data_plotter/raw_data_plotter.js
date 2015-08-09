@@ -35,7 +35,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     //$scope.data = [ ]; //Y
 
     //ui panel for ng-show
-    $scope.show_step_1 = true;
+    $scope.show_step_1 = false;
     $scope.show_step_2 = false;
     $scope.show_step_3 = false;
     $scope.show_step_4 = false;
@@ -137,7 +137,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
      show_individual_date_or_month = bool, optional, for single point multiple dates or months
      * */
     $scope.send_query = function () //Testing query string params for get and data for post
-    {
+    { //this function is called when user press 'Get data' button
         $http
             .get('ngQueries', {
                 params: {
@@ -154,11 +154,11 @@ app.controller('myCtrl', function ($scope, $http, $window) {
                 if (data.success) {
 
                     $scope.data_list = data.plot_data;
-                    $scope.process_plot_data(data);
+                    $scope.process_plot_data(data); // create plot
                     //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
                     //$scope.msg = 'Loaded dataList' + " " + data.plot_data.length;
                 } else {
-                    $window.alert('Retrieval failed 22');
+                    $window.alert('Retrieval failed');
                 }
             })
             .error(function (data, status, headers, config) {
@@ -186,52 +186,33 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.table_data = data.plot_data;
         $scope.plot_title = data.y_label;
         $scope.plot_footer = data.x_label;
-        //$scope.msg = display;
-        //{
-        //   temp_X.push(data.plot_data[i].X);
-        //    //console.log(item.X);
-        //    temp_Y.push(data.plot_data[i].Y.ch_avg);
-        //    count = count+1;
-        //    //$scope.data.push(item.Y.ch_avg);
-        //}
+
         $scope.labels.push.apply($scope.labels, temp_X);
 
         $scope.data = new Array(1);
         $scope.data[0] = new Array(temp_Y.length);
-        //$scope.data[0].push(temp_Y);
+
         $scope.legend = true;
-        //$scope.options ={
-        //    'scaleShowLabels': 'false',
-        //    'tooltipFontSize': '20'
-        //
-        //};
+
         for (var j = 0; j < temp_Y.length; j++) {
             $scope.data[0][j] = temp_Y[j];
         }
 
         $scope.series.push(data.y_label);
-        //display ='';
-        //for (var i = 0; i<labels.length;i++)
-        //{
-        //     display = display + " label = "+ $scope.labels[i] +" data = "+ $scope.data[i];
-        //}
-        //     $scope.labels = ['0:00','0:10','0:20'];
-        //$scope.series = ['Series A','Series B'];
-        //
-        //
-        //$scope.data = [
-        //    [1.2,1.3,1.4],
-        //    [1.2,10.3,2.4]
-        //];
+
         $scope.show_plot = true;
     };
+
     $scope.init_logger = function () {
+        //init step
+        $scope.show_step_1 = false;
         $http
             .get('getLoggers')
             .success(function (data, status, headers, config) {
                 if (data.success) {
 
                     $scope.logger_list = data.loggerList;
+                     $scope.show_step_1 = true;
                     //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
 
                 } else {
@@ -242,11 +223,11 @@ app.controller('myCtrl', function ($scope, $http, $window) {
                 $window.alert('Retrieval failed');
             });
     };
-    $scope.init_logger();
+    $scope.init_logger();//call this function to initialize the step 1
 
 
     $scope.get_sensor_list = function (logger_id) {
-        //step 1
+        //step 2 populate all available sensors for a selected logger from step 1
         $scope.show_step_2 = false;
         $scope.show_step_3 = false;
         $scope.show_step_4 = false;
@@ -273,7 +254,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     };
 
     $scope.get_sensor_details = function (sensor_select_value) {
-        //step 2
+        //step 2 populate with sensor details when user selects a sensor from the drop down list
         $scope.show_step_3 = false;
         $scope.show_step_4 = false;
         $scope.show_step_5 = false;
@@ -316,14 +297,12 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         if (option.valueOf() == 'by_date') {
             $scope.by_date = true;
             $scope.by_month = false;
-            //$scope.dateOptions = $scope.dateOptions_day;
-            // $scope.show_step_4 = true;
+
         }
         else if (option.valueOf() == 'by_month') {
             $scope.by_date = false;
             $scope.by_month = true;
-            //$scope.dateOptions = $scope.dateOptions_month;
-            //$scope.show_step_4 = true;
+
         }
         else {
             $scope.by_date = false;
@@ -332,6 +311,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     };
 
     $scope.option_single_or_range = function (option) {
+        //step 3b
         $scope.show_step_4 = false;
         $scope.show_step_5 = false;
         $scope.show_button = false;
@@ -340,11 +320,9 @@ app.controller('myCtrl', function ($scope, $http, $window) {
         $scope.show_end_date_calendar = false;
         $scope.end_date_ui = null;
         $scope.start_date_ui = null;
-        //  $scope.enable_start_date = false;
-        //$scope.enable_end_date = false;
-        //after step 3b
+
         if (option.valueOf() == 'single') {
-            //set up calendar
+            //set up calendar if single month or date selected
 
             $scope.show_start_date_calendar = true;
             $scope.show_end_date_calendar = false;
@@ -379,7 +357,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
                     $scope.min_date = new Date(data.min_date);
                     $scope.max_date = new Date(data.max_date);
-                    //$scope.get_sensor_list( $scope.logger_list[0].logger.id)
+
 
                     $scope.minDate = $scope.min_date;
                     $scope.maxDate = $scope.max_date;
@@ -422,11 +400,12 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     };
 
     $scope.closeAlert = function (index) {
+        //closing flash msg for validate date function
         $scope.alerts.splice(index, 1);
     };
 
     $scope.validate_date = function () {
-        //validate date
+        //validate date called when next button in step 4 is pressed
 
         $scope.show_step_5 = false;
         $scope.show_button = false;
@@ -450,14 +429,12 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
             $scope.alerts.push({type: 'danger', msg: 'please set dates'});
         }
-        //$scope.show_button = true;
-        //$scope.show_plot = true;
 
     };
 
     $scope.option_plot_type = function (option_value) {
         //step 5
-        //$scope.show_step_5 = false;
+
         $scope.show_button = false;
         $scope.show_plot = false;
         $scope.by_timestamp = false;
@@ -489,6 +466,7 @@ app.controller('myCtrl', function ($scope, $http, $window) {
 
 
     $scope.open_start = function ($event) {
+        //this is for start date date picker function
         $event.preventDefault();
         $event.stopPropagation();
 
@@ -496,15 +474,11 @@ app.controller('myCtrl', function ($scope, $http, $window) {
     };
 
     $scope.open_end = function ($event) {
+        //this is for end date date picker function
         $event.preventDefault();
         $event.stopPropagation();
 
         $scope.opened_end = true;
     };
 
-
-    //$scope.formats = ['dd-MMMM-yyyy','MMMM.yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
-    // $scope.format = $scope.formats[0];
-
-    //////////////////////////////////////////////////////////////////////////////
 });
