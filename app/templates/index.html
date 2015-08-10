@@ -1,11 +1,18 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %} HOME {% endblock %}
+{% block title %} USDK Wind Data Viewer {% endblock %}
 {% block brand_href %} href="/"{% endblock %}
 
 {% block content_1 %}
 
+    <h1> Welcome to USDK Wind Data Viewer.</h1>
+    {% if current_user.is_authenticated() == True %}
+    {% include 'logged_in_gist_view.html' %}
+        {% else %}
+
+        <h2 class="text-left">Please <a href="{{ url_for('auth.login') }}"> Log in </a></h2>
+    {% endif %}
 {% endblock %}
 {% block content_2 %}
 {% endblock %}

@@ -19,8 +19,11 @@ class Rawdata_plotter_helper(object):
         """
         This dictionary is built by each query functions and sent Json builder class for JSON response
         :param query: Flask-SqlAlchemy object may be a list or single object.
-        :param date: python datetime.datetime object maybe list, tuple or single object
-        :param sensor_id: integer
+        @:type query: db.query
+        :param date:  maybe list, tuple or single object
+        @:type date: datetime.datetime
+        :param sensor_id: Sensor ID
+        @:type sensor_id: int
         :param time_stamp: defaults to None. it is used by 24hr queries. sends a list of strings..e.g. ['00:00', '00:10'...
         :return: returns a dictionary using the parameters
         """
@@ -37,8 +40,10 @@ class Rawdata_plotter_helper(object):
     def get_Data_Date_24Hr(date, sensor_id):
         """
         queries for 24hr data for a particular date for a particular sensor.
-        :param date: python datetime.datetime object
-        :param sensor_id: integer
+        :param date: Date
+        @:type date: datetime.datetime
+        :param sensor_id: Sensor ID
+        @:type sensor_id: int
         :return: returns a dict of query result, date (single datetime.datetime object), sensor_id (integer)
         and list of HH:MM strings
         """
@@ -69,8 +74,10 @@ class Rawdata_plotter_helper(object):
     def get_Data_Date_Single_Point(date, sensor_id):
         """
         queries for avg value for a senspr on a particular date
-        :param date: python datetime.datetime object
-        :param sensor_id: integer
+        :param date: Date
+        @:type date: datetime.datetime
+        :param sensor_id: Sensor ID
+        @:type sensor_id: int
         :return: returns a dict of query result (single sqlalchemy object with count one), date (single datetime.datetime object), sensor_id (integer)
         """
         if isinstance(date, datetime.datetime):
@@ -103,23 +110,24 @@ class Rawdata_plotter_helper(object):
         :return: returns a dict of query result ( list of sqlalchemy query object with count one),
         date (tuple of datetime.datetime object), sensor_id (integer) and list of HH:MM strings
         """
-        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
+        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):  # validate dates
             if endDate >= startDate:
                 try:
-                    sensor_id = int(sensor_id)
+                    sensor_id = int(sensor_id) # validate sensor_id
                 except ValueError:
                     raise ValueError('sensor_id must be an integer')
                 start_date_param = str(startDate.year) + str(startDate.month) + str(startDate.day)
                 end_date_param = str(endDate.year) + str(endDate.month) + str(endDate.day)
-
+                # first find all the distinct time_stamp for the sensor_id between start_date and end_date
                 query_distinct_time_stamps = RawData.query.with_entities(RawData.time_stamp.distinct().label('time_stamp')).filter(
                     RawData.yearmonthdate_stamp >= start_date_param,
                     RawData.yearmonthdate_stamp <= end_date_param,
                     RawData.fk_sensor_id == sensor_id)
-                query_list = list()
-                time_stamp_list = list()
+                query_list = list()  # initialize empty list
+                time_stamp_list = list()  # initialize empty list
                 for item in query_distinct_time_stamps.all():
-
+                    # now get average of all data for the sensor_id between date range for one time_stamp
+                    # and append to query_list
                     query_list.append(RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
                                                                   db.func.avg(RawData.ch_max).label('ch_max'),
                                                                   db.func.avg(RawData.ch_avg).label('ch_avg'),
@@ -129,6 +137,7 @@ class Rawdata_plotter_helper(object):
                         RawData.yearmonthdate_stamp <= end_date_param,
                         RawData.fk_sensor_id == sensor_id,
                         RawData.time_stamp == item.time_stamp))
+                    # append the one time_stamp to time_stamp_list
                     time_stamp_list.append(item.time_stamp)
 
                 # test code start
@@ -153,14 +162,27 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id):
+        """
+        Queries for avg value between two dates
+        :param startDate: Start date
+        @:type startDate: datetime.datetime
+        :param endDate: End date
+        @:type endDate: datetime.datetime
+        :param sensor_id: Sensor id from database table
+        @:type sensor_id: int
+        :return: returns a dict of query result ( sqlalchemy query object with count one),
+        date (tuple of datetime.datetime object), sensor_id (integer)
+        """
         if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
             if endDate >= startDate:
                 try:
                     sensor_id = int(sensor_id)
                 except ValueError:
                     raise ValueError('sensor_id must be an integer')
+                # build strings for RawData.yearmonthdate_stamp field from startDate and end endDate
                 start_date_param = str(startDate.year) + str(startDate.month) + str(startDate.day)
                 end_date_param = str(endDate.year) + str(endDate.month) + str(endDate.day)
+                # now get average of all data for the sensor_id between date range
                 query = RawData.query.with_entities(db.func.avg(RawData.ch_min).label('ch_min'),
                                                     db.func.avg(RawData.ch_max).label('ch_max'),
                                                     db.func.avg(RawData.ch_avg).label('ch_avg')).\
@@ -184,14 +206,26 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Date_Range_Single_Point_for_each_Date(startDate, endDate, sensor_id):
-        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
-            if endDate >= startDate:
+        """
+        Queries for avg value between two dates shows average for each date between range
+        :param startDate: Start date
+        @:type startDate: datetime.datetime
+        :param endDate: End date
+        @:type endDate: datetime.datetime
+        :param sensor_id: Sensor id from database table
+        @:type sensor_id: int
+        :return: returns a dict of query result ( list of sqlalchemy query object each with count one),
+        date (list of datetime.datetime object), sensor_id (integer)
+        """
+        if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):  # validate dates data type
+            if endDate >= startDate:  # validate dates value
                 try:
-                    sensor_id = int(sensor_id)
+                    sensor_id = int(sensor_id) # validate sensor data type
                 except ValueError:
                     raise ValueError('sensor_id must be an integer')
-                query_list = list()
-                date_list = list()
+                query_list = list()  # initilize empty list
+                date_list = list() # initilize empty list
+                # loop for each date between the date range using dateutil.rrule function
                 for dt in rrule.rrule(rrule.DAILY, dtstart=startDate, until=endDate):
                     res = Rawdata_plotter_helper.get_Data_Date_Single_Point(dt, sensor_id)
                     query = res['query']
@@ -213,19 +247,28 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Month_Single_Point(date, sensor_id):
+        """
+        Queries for avg value for a single month
+        :param date: Date
+        @:type date: datetime.datetime
+        :param sensor_id: Sensor id from database table
+        @:type sensor_id: int
+        :return: returns a dict of query result ( sqlalchemy query object with count one),
+        date (datetime.datetime object), sensor_id (integer)
+        """
         if isinstance(date, datetime.datetime):
             try:
                 sensor_id = int(sensor_id)
             except ValueError:
                 raise ValueError('sensor_id must be an integer')
-
+            # get last day of a month
             (weekday_of_first_day_month, end_date_month) = calendar.monthrange(date.year, date.month)
-
+            # build start date of a month
             start_date = datetime.datetime(date.year, date.month, 1)
-            # print type(start_date)
+            # build end end date of a month
             end_date = datetime.datetime(date.year, date.month, end_date_month)
             res = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(start_date, end_date, sensor_id)
-            query = res['query']
+            query = res['query'] # get result from the dictionary returned by the Rawdata_plotter_helper.get_Data_Date_Range_Single_Point function
            # #test code start
            #  print 'count ', query.count()
            #  print 'ch_max ', query.first().ch_max
@@ -239,17 +282,31 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Month_Range_Single_Point(startDate, endDate, sensor_id):  # single data point for all month
+        """
+        Queries for avg value between months returns total average
+        :param startDate: Start date
+        @:type startDate: datetime.datetime
+        :param endDate: End date
+        @:type endDate: datetime.datetime
+        :param sensor_id: Sensor id from database table
+        @:type sensor_id: int
+        :return: returns a dict of query result ( sqlalchemy query object with count one),
+        date (tuple datetime.datetime object), sensor_id (integer)
+        """
         if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
             if endDate >= startDate:
                 try:
                     sensor_id = int(sensor_id)
                 except ValueError:
                     raise ValueError('sensor_id must be an integer')
+                # get last day of a month
                 (weekday_of_first_day_month, end_date_of_month) = calendar.monthrange(endDate.year, endDate.month)
+                # build start date of a month
                 startDate = datetime.datetime(startDate.year, startDate.month, 1)
+                # build end end date of a month
                 endDate = datetime.datetime(endDate.year, endDate.month, end_date_of_month)
                 res = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(startDate, endDate, sensor_id)
-                query = res['query']
+                query = res['query'] # get result from the dictionary returned by the Rawdata_plotter_helper.get_Data_Date_Range_Single_Point function
                 # #test code start
                 # print 'count ', query.count()
                 # print 'ch_max ', query.first().ch_max
@@ -269,19 +326,31 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Month_Range_Single_Point_for_each_Month(startDate, endDate, sensor_id):  # single data point for each month
+        """
+        Queries for avg value between two months shows average for each month between range
+        :param startDate: Start date
+        @:type startDate: datetime.datetime
+        :param endDate: End date
+        @:type endDate: datetime.datetime
+        :param sensor_id: Sensor id from database table
+        @:type sensor_id: int
+        :return: returns a dict of query result ( list of sqlalchemy query object each with count one),
+        date (list of datetime.datetime object), sensor_id (integer)
+        """
         if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
             if endDate >= startDate:
                 try:
                     sensor_id = int(sensor_id)
                 except ValueError:
                     raise ValueError('sensor_id must be an integer')
-                startDate_query = datetime.datetime(startDate.year,startDate.month,1)
-                # (weekday_of_first_day_month, end_Date_ofmonth) = calendar.monthrange(endDate.year, endDate.month)
-                endDate_query = datetime.datetime(endDate.year, endDate.month, 1)
-                # enddate_query = datetime.datetime(enddate.year,enddate.month)
+                startDate_query = datetime.datetime(startDate.year, startDate.month, 1)  # first day of month for startDate
+
+                endDate_query = datetime.datetime(endDate.year, endDate.month, 1)  # first day of month for endtDate
+
                 query_list = list()
                 month_list = list()
-                for dt in rrule.rrule(rrule.MONTHLY,dtstart=startDate_query,until=endDate_query):
+                # loop for each month between the date range using dateutil.rrule function
+                for dt in rrule.rrule(rrule.MONTHLY, dtstart=startDate_query, until=endDate_query):
                     res = Rawdata_plotter_helper.get_Data_Month_Single_Point(dt, sensor_id)
                     query = res["query"]
                     query_list.append(query)
@@ -300,6 +369,14 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Month_24Hr(date, sensor_id):
+        """
+        queries for 24hr data for a particular month for a particular sensor.
+        :param date: Date
+        @:type date: datetime.datetime
+        :param sensor_id: Sensor ID
+        @:type sensor_id: int
+        :return: returns a dict of same as Rawdata_plotter_helper.get_Data_Date_Range_24Hr(start_date, end_date, sensor_id)
+        """
         if isinstance(date, datetime.datetime):
             try:
                 sensor_id = int(sensor_id)
@@ -309,17 +386,17 @@ class Rawdata_plotter_helper(object):
             (weekday_of_first_day_month, end_date_month) = calendar.monthrange(date.year, date.month)
 
             start_date = datetime.datetime(date.year, date.month, 1)
-            # print type(start_date)
+
             end_date = datetime.datetime(date.year, date.month, end_date_month)
             res = Rawdata_plotter_helper.get_Data_Date_Range_24Hr(start_date, end_date, sensor_id)
-            # print res
-            query = res['query']
-           # #test code start
-           #  print 'count ', query.count()
-           #  print 'ch_max ', query.first().ch_max
-           #  print 'ch_min ', query.first().ch_min
-           #  print 'ch_avg ', query.first().ch_avg
-           #  #test code end]
+
+            # query = res['query']
+            # #test code start
+            #  print 'count ', query.count()
+            #  print 'ch_max ', query.first().ch_max
+            #  print 'ch_min ', query.first().ch_min
+            #  print 'ch_avg ', query.first().ch_avg
+            #  #test code end]
             return res
         else:
             raise TypeError('date must be of type datetime.datetime')
@@ -327,13 +404,21 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Month_Range_Single_Point_for_each_Day(startDate, endDate, sensor_id):
-
+        raise NotImplementedError('Do we need this?')
         # Todo call where startdate is 1st day stardate month and end date is last day of endday monthRawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date()
         # ToDo do we need this?
         pass
 
     @staticmethod
     def get_Data_Month_Single_Point_for_each_Day(date, sensor_id):
+        """
+        Queries for avg value for a month returns average for each date between start and end date of a month.
+        :param date: Date
+        @:type date: datetime.datetime
+        :param sensor_id: Sensor ID
+        @:type sensor_id: int
+        :return: returns a dict of same as Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date
+        """
 
         if isinstance(date, datetime.datetime):
             try:
@@ -349,13 +434,13 @@ class Rawdata_plotter_helper(object):
 
             res = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point_for_each_Date(start_date, end_date, sensor_id)
             # print res
-            query = res['query']
-           # #test code start
-           #  print 'count ', query.count()
-           #  print 'ch_max ', query.first().ch_max
-           #  print 'ch_min ', query.first().ch_min
-           #  print 'ch_avg ', query.first().ch_avg
-           #  #test code end]
+            # query = res['query']
+            # #test code start
+            #  print 'count ', query.count()
+            #  print 'ch_max ', query.first().ch_max
+            #  print 'ch_min ', query.first().ch_min
+            #  print 'ch_avg ', query.first().ch_avg
+            #  #test code end]
             return res
         else:
             raise TypeError('date must be of type datetime.datetime')
@@ -364,6 +449,17 @@ class Rawdata_plotter_helper(object):
 
     @staticmethod
     def get_Data_Month_Range_24Hr(startDate, endDate, sensor_id):
+        """
+        queries for 24hr time_stamp view for a range of months
+        :param startDate: Start date
+        @:type startDate: datetime.datetime
+        :param endDate: End date
+        @:type endDate: datetime.datetime
+        :param sensor_id: Sensor id from database table
+        @:type sensor_id: int
+        :return: returns a dict of query result ( list of sqlalchemy query object each with count one),
+        date (tuple of datetime.datetime object), sensor_id (integer) and list of HH:MM strings
+        """
         if isinstance(startDate, datetime.datetime) and isinstance(endDate, datetime.datetime):
             if endDate >= startDate:
                 try:
@@ -373,7 +469,7 @@ class Rawdata_plotter_helper(object):
                 (weekday_of_first_day_month, end_date_month) = calendar.monthrange(endDate.year, endDate.month)
 
                 start_date = datetime.datetime(startDate.year, startDate.month, 1)
-                # print type(start_date)
+
                 end_date = datetime.datetime(endDate.year, endDate.month, end_date_month)
                 return Rawdata_plotter_helper.get_Data_Date_Range_24Hr(start_date, end_date, sensor_id)
             else:
@@ -385,3 +481,4 @@ class Rawdata_plotter_helper(object):
 
     pass
 
+# todo add comparison functions

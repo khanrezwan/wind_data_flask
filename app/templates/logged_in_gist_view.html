@@ -1,0 +1,51 @@
+<div class="section">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>At a glance</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% if day_count %}
+                <tr>
+                <td>Data is available for </td>
+                <td> <strong>{{day_count}}</strong> day(s)</td>
+                </tr>
+              {% endif %}
+              {% if latest_date %}
+                <tr>
+                  <td>Latest Available Data</td>
+                  <td class="text-left"><strong>{{latest_date.strftime('%d-%b-%Y')}}</strong></td>
+                </tr>
+              {% endif %}
+                {% if earliest_date %}
+                <tr>
+                  <td>Earliest Available Data</td>
+                  <td class="text-left"><strong>{{earliest_date.strftime('%d-%b-%Y')}}</strong></td>
+                </tr>
+                {% endif %}
+               {% if ch1_avg %}
+                <tr>
+
+                  <td>Channel 1: Average Wind speed @ 110m</td>
+                  <td class="text-left"> <strong>{{ch1_avg}}</strong> m/s</td>
+
+                </tr>
+                   {% endif %}
+              {% if ch2_avg %}
+                   <tr>
+                   <td>Channel 2: Average Wind speed @ 110m</td>
+                   <td class="text-left"> <strong>{{ch2_avg}}</strong> m/s</td>
+                   </tr>
+               {% endif %}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>

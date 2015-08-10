@@ -1,7 +1,7 @@
 # Library Imports
 from datetime import datetime
 from flask import render_template, session, redirect, url_for, request, flash, g
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
 # from werkzeug import check_password_hash, generate_password_hash
 from flask import current_app as app
 from werkzeug import secure_filename
@@ -10,6 +10,7 @@ import os
 
 from . import main
 from .forms import *
+from ..raw_data_plotter.Rawdata_plotter_helper import Rawdata_plotter_helper
 
 from .. import db
 from ..models import *
@@ -17,10 +18,41 @@ from ..wind_data_parser import Parser
 from ..decorators import base_page_dictionary_builder, requires_roles
 
 
+def build_logged_in_gist_view():
+    date = RawData.query.with_entities(db.func.min(RawData.date_time).label('min'),
+                                       db.func.max(RawData.date_time).label('max'))\
+        .filter(RawData.fk_sensor_id == 1)
+    # max_date = RawData.query.with_entities(db.func.max(RawData.date_time).label('date')).filter(RawData.fk_sensor_id == sensor_id).first()
+    # min_date = db.session.query(db.func.min(RawData.date_time).label('min_date')).filter(RawData.fk_sensor_id == sensor_id).first() ## same effect
+    if (date.first().min is None) or (date.first().max is None):
+        return dict()
+    latest_date = date.first().max
+    earliest_date = date.first().min
+    ch1_avg_query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(earliest_date, latest_date, 1)
+    ch2_avg_query = Rawdata_plotter_helper.get_Data_Date_Range_Single_Point(earliest_date, latest_date, 2)
+    ch1_avg = float("{0:.2f}".format(ch1_avg_query['query'].first().ch_avg))
+    ch2_avg = float("{0:.2f}".format(ch2_avg_query['query'].first().ch_avg))
+    total_days_available_query = RawData.query.with_entities(RawData.yearmonthdate_stamp.distinct().label('date'))\
+        .filter(RawData.fk_sensor_id == 1)
+
+    day_count = total_days_available_query.count()
+    return {
+        'latest_date': latest_date,
+        'earliest_date': earliest_date,
+        'ch1_avg': ch1_avg,
+        'ch2_avg': ch2_avg,
+        'day_count': day_count
+        }
+    pass
+
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
-
-    return render_template('index.html')
+    if current_user.is_authenticated() == True:
+        param_dict = build_logged_in_gist_view()
+        return render_template('index.html', **param_dict)
+    else:
+        return render_template('index.html')
     pass
 
 
