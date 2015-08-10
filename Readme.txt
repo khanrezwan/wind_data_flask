@@ -25,7 +25,7 @@ I will assume you are using virtualenv to install $ sudo apt-get install virtual
 [14] Finally run $ decativate to quit virtualenv
 
 Deployment:
-1 gunicorn --daemon --bind 127.0.0.1:8000 --timeout 600 --workers 4 --threads 2 manage:app
+1 gunicorn --daemon --bind 127.0.0.1:8000 --timeout 600 manage:app
 1 Might want to test the --daemon in gunicorn
 2. follow this guide https://realpython.com/blog/python/kickstarting-flask-on-ubuntu-setup-and-deployment/
 3. before pip install MySQL-python: sudo apt-get install libmysqlclient-dev

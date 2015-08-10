@@ -36,6 +36,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
                               'mysql://usdk_db_admin:abc123@localhost/usdk_wind_data_DB'
 
