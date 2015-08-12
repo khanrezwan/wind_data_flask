@@ -3,7 +3,7 @@ __author__ = 'rezwan'
 from flask import jsonify
 import datetime
 import calendar
-#app specific imports
+# app specific imports
 from .. import db
 from ..models import RawData, Sensor
 from .Rawdata_plotter_helper import dict_keys
@@ -251,7 +251,7 @@ class JsonBuilder(object):
         elif Xlabel == JsonBuilder.MONTH:
             return 'Month '
             pass
-        elif Xlabel == JsonBuilder.TIMESTAMP: # pass a string time_stamp not datetime
+        elif Xlabel == JsonBuilder.TIMESTAMP:  # pass a string time_stamp not datetime
             return 'HH:MM'
 
 
@@ -323,43 +323,3 @@ class JsonBuilder(object):
             return serial
         raise TypeError("Type not serializable")
     pass
-
-        # if isinstance(query, list):
-        #     print "Query list"
-        #     if isinstance(date, list):
-        #         print "Date is List"
-        #         pass
-        #     elif isinstance(date, tuple):
-        #         print "Date is tuple"
-        #         pass
-        #     else:
-        #         # should be a list
-        #         print "Date single point " # get_Data_Date_Range_24Hr
-        #         pass
-        #
-        #     pass
-        # elif query.count() == 1:
-        #     # Work with single point single for X and Y
-        #     print "Query single point"
-        #     if isinstance(date, list):
-        #         print "Date is list"
-        #     elif isinstance(date, tuple):
-        #         print "Date is tuple"
-        #     else:
-        #          print " Date single point"
-        #
-        #     pass
-        # elif query.count() > 1:
-        #     if isinstance(date, list):
-        #         print "Query multi point Date is list"
-        #
-        #     elif isinstance(date, tuple):
-        #         print "Date is tuple"
-        #
-        #     else:
-        #         print "Query multi point Date single point"
-        #
-        #     pass
-        # else:
-        #     print "No result in Query"
-        #     pass

@@ -5,13 +5,13 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     CSRF_ENABLED = True
-    CSRF_SESSION_KEY = "secret"
+    CSRF_SESSION_KEY = os.environ.get('CSRF_SESSION_KEY') or "secret"
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    WDV_MAIL_SUBJECT_PREFIX = '[WDV]'
-    WDV_MAIL_SENDER = 'WDV Admin <flasky@example.com>'
+    # WDV_MAIL_SUBJECT_PREFIX = '[WDV]'
+    # WDV_MAIL_SENDER = 'WDV Admin <flasky@example.com>'
     WDV_ADMIN = os.environ.get('WDV_ADMIN')
     UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads/')
-    ALLOWED_EXTENSIONS = ['txt']
+    ALLOWED_EXTENSIONS = ['txt']  # configured for txt file upload
 
     @staticmethod
     def init_app(app):
