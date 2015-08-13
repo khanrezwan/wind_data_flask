@@ -236,16 +236,6 @@ def get_sensors_available_dates(sensor_id):
             })
 
 
-@raw_data_plotter.route('/test_strings', methods=['Get'])
-def testing_query():
-    # print request.query_string
-    date = (request.args.get('date'))
-    if date:
-        date = string_to_boolean(date)
-    # print date
-    return make_response(jsonify({'success': True}), 200)
-
-
 @raw_data_plotter.route('/', methods=['Get'])
 @login_required
 def index():

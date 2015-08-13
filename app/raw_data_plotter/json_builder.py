@@ -12,10 +12,12 @@ from .Rawdata_plotter_helper import dict_keys
 
 class JsonBuilder(object):
     """
-    1. This class will return json data and http response code
-    2. it will receive query or query list and build json dict as following
-    3. {"xy_list":[{"xy":{"x":1,"y":1}},{"xy":{"x":2,"y":6}},{"xy":{"x":4,"y":9}}]}
-    4. sample json object:
+    1. json_response function converts dictionary data received from Rawdata_plotter_helper get functions and returns
+    Json response with code
+    2. This class will return json data and http response code
+    3. it will receive query or query list and build json dict as following
+    4. {"xy_list":[{"xy":{"x":1,"y":1}},{"xy":{"x":2,"y":6}},{"xy":{"x":4,"y":9}}]}
+    5. sample json object:
 
         {"xy_list":[
             "y_label": "Channel 1 : Sensor desciption",
@@ -44,31 +46,46 @@ class JsonBuilder(object):
 
     @staticmethod
     def json_response(dictionary, Xlabel=DATE):
+        """
+        Converts to dictionary data received from Rawdata_plotter_helper get functions to angular-chartJS plot data.
+        This function is generic enough to be used for any plotting library e.g. Pygal.
+        This function returns json errors rather than python error as view will response with the returned value from
+        this function
+        :param dictionary: Dictionary from Rawdata_plotter_helper get functions
+        :param Xlabel: Xlabel is set by raw_data_plotter.views.get_ng_params() route.
+        It select the X axis label for plotting library
+        :return: Returns a tuple of  serialized dictionary followed by integer http response code
+        """
         # ToDo-Rezwan Add comment as the function is way too convoluted
 
-        if isinstance(dictionary, dict):
+        if isinstance(dictionary, dict):  # Check if it is a python dict
+            # If it is a dictionary check for the keys supposed to be ib=n Rawdata_plotter_helper dictionary keys
             dictionary_keys = dictionary.keys()
             for key in dict_keys:
                 if key not in dictionary_keys:
+
                     return jsonify({'error': 'Not the expected dictionary'}), 404
                     # raise KeyError('Not the expected dictionary')
         else:
             return jsonify({'error': 'Not a dictionary'}), 404
             # raise TypeError("the parameter dictionary must be a python dict")
+        # get values from dictionary
         query = dictionary['query']
         sensor_id = dictionary['sensor_id']
         date = dictionary['date']
         time_stamp = dictionary['time_stamp']
 
-        sensor, found = JsonBuilder.sensor_validator(sensor_id)
+        sensor, found = JsonBuilder.sensor_validator(sensor_id) # check if sensor is in database
         # print sensor, ' ', found
-        JsonBuilder.datetime_validator(date)
-        if found:
-            date_format = "%d-%b-%Y"
+        # Todo need to handle result from JsonBuilder.datetime_validator(date) rather than just calling it
+        JsonBuilder.datetime_validator(date)  # validate Json Date object validator
+        if found:  # if sensor found in database
+            date_format = "%d-%b-%Y"  # date format used by X data
+            # build description from sensor for Y data label
             y_label_text = 'Channel ' + str(sensor.channel)+': ' + sensor.description + ' @ height ' \
                            + str(sensor.height) + 'm'
-            X_label_text = JsonBuilder.extract_x_label_text(Xlabel)
-            if isinstance(query, list):
+            X_label_text = JsonBuilder.extract_x_label_text(Xlabel)  # build X label depends on supplied parameter
+            if isinstance(query, list): # If query is a list
                 if isinstance(date, list) and time_stamp is None:
                     # get_Data_Date_Range_Single_Point_for_each_Date(startDate, endDate, sensor_id)
                     # get_Data_Month_Range_Single_Point_for_each_Month
@@ -147,7 +164,7 @@ class JsonBuilder(object):
                     return jsonify({'plot_data': plot_data,
                                     "y_label": y_label_text,
                                     "x_label": X_label_text,
-                                    "success": True}) ,200
+                                    "success": True}), 200
                     pass
                 elif query.count() == 1 and not(isinstance(date, list) or isinstance(date, tuple)) and time_stamp is None:
                     # get_Data_Date_Single_Point(date, sensor_id)
