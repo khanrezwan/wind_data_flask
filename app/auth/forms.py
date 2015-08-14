@@ -41,3 +41,11 @@ class AddRoles(Form):
     def validate_name(self, field):
         if Role.query.filter_by(name=field.name.lower()).first():
             raise ValidationError('Role already registered.')
+
+
+class ChangePasswordForm(Form):
+    old_password = PasswordField('Old password', validators=[DataRequired()])
+    password = PasswordField('New password', validators=[DataRequired(),
+                                                         EqualTo('password2', message='Passwords must match')])
+    password2 = PasswordField('Confirm new password', validators=[DataRequired()])
+    submit = SubmitField('Update Password')

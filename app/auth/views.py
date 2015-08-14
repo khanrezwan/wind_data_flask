@@ -120,6 +120,25 @@ def registeruser():
     return render_template('auth/register.html', form=form)
 
 
+
+##########
+# Change password #
+##########
+@auth.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.old_password.data):
+            current_user.password = form.password.data
+            db.session.add(current_user)
+            flash('Your password has been updated.')
+            return redirect(url_for('main.index'))
+        else:
+            flash('Invalid password.')
+    return render_template("auth/change_password.html", form=form)
+    pass
+
 ##########
 # Add Roles #
 ##########

@@ -77,7 +77,7 @@ class JsonBuilder(object):
 
         sensor, found = JsonBuilder.sensor_validator(sensor_id) # check if sensor is in database
         # print sensor, ' ', found
-        # Todo need to handle result from JsonBuilder.datetime_validator(date) rather than just calling it
+
         JsonBuilder.datetime_validator(date)  # validate Json Date object validator
         if found:  # if sensor found in database
             date_format = "%d-%b-%Y"  # date format used by X data
@@ -232,7 +232,7 @@ class JsonBuilder(object):
                     return jsonify({'error': 'No Query result from database'}), 404
                     pass
             else:
-                return jsonify({'error': 'query is an unexpected object'}), 404
+                return jsonify({'error': 'query is an unexpected object'}), 400
         else:
             return jsonify({'error': 'Sensor not found in database'}), 404 #sensor is string and 404 is not found
 
@@ -277,13 +277,13 @@ class JsonBuilder(object):
         if isinstance(date, list) or isinstance(date, tuple):
             for dt in date:
                 if not isinstance(dt, datetime.datetime):
-                    return jsonify({'error': 'date must be of type datetime.datetime'}), 404
-                    # raise TypeError('date must be of type datetime.datetime')
+                    # return jsonify({'error': 'date must be of type datetime.datetime'}), 400
+                    raise TypeError('date must be of type datetime.datetime')
 
         else:
             if not isinstance(date, datetime.datetime):
-                return jsonify({'error': 'date must be of type datetime.datetime'}), 404
-                # raise TypeError('date must be of type datetime.datetime')
+                # return jsonify({'error': 'date must be of type datetime.datetime'}), 400
+                raise TypeError('date must be of type datetime.datetime')
 
     @staticmethod
     def sensor_validator(sensor_id):
@@ -296,8 +296,8 @@ class JsonBuilder(object):
         try:
             sensor_id = int(sensor_id)
         except ValueError:
-            return jsonify({'error': '"sensor_id must be an integer'}), 404
-            # raise ValueError("sensor_id must be an integer")
+            # return jsonify({'error': '"sensor_id must be an integer'}), 404
+            raise ValueError("sensor_id must be an integer")
         query = Sensor.query.filter(Sensor.id == sensor_id)
         if query.count() != 0:
             found = True
