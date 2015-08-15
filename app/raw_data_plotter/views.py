@@ -7,9 +7,9 @@ from flask.ext.login import login_required
 # App specific imports
 
 from . import raw_data_plotter
-from .forms import *
+
 from .Rawdata_plotter_helper import Rawdata_plotter_helper
-from .. import db
+
 from ..models import *
 from .json_builder import JsonBuilder
 
@@ -43,7 +43,7 @@ def string_to_boolean(obj):
 @login_required
 def get_ng_params():
     """
-    This is the main route where angular JS will send query string
+    This is the main route where angular JS will send query string. This view is tightly coupled with angular JS UI
     :return: JSON data with response code
     """
     # print request.query_string
